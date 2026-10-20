@@ -2,4 +2,9 @@
 title: "What is associated with the gap?"
 ---
 
-Adjusted associations and peer groups will be added after the hospital-period panel and covariate joins pass documented quality checks.
+The first driver model uses the latest common reporting period (ending September 30, 2025), with 3,023 hospitals that had reportable OP-18b and OP-18c scores and at least 11 sampled patients in each. It links current CMS hospital type, ownership, emergency-service status, and 2023 USDA county rurality. The model includes state fixed effects and state-clustered standard errors. It is a cross-sectional association model, not a causal explanation.
+
+The hospital-type and rurality peer groups are set before looking at outcomes. Four groups have at least 20 hospitals: acute-care/metro (n=1,650; median gap 89 minutes), critical-access/nonmetro (n=637; 70 minutes), acute-care/nonmetro (n=508; 94 minutes), and critical-access/metro (n=152; 69 minutes). The full [driver report](../results/hospital_driver_analysis.md), [adjusted coefficient table](../results/hospital_driver_model_coefficients.csv), and [hospital-to-peer file](../results/hospital_peer_comparison.csv) include model details and cautions.
+
+Current characteristics cannot establish historical ownership, bed count, safety-net status, nearby psychiatric bed supply, or workforce shortage status. Those factors remain out of the model. Counties with ambiguous county-equivalent names are not assigned an invented RUCC code. This result is not a hospital quality ranking.
+
