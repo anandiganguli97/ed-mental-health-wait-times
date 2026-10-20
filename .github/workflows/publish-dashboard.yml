@@ -1,0 +1,55 @@
+name: Publish ED mental health dashboard
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: github-pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Assemble Pages artifact
+        shell: bash
+        run: |
+          mkdir -p _site/site _site/results _site/policy
+          cp -R site/. _site/site/
+          cp -R results/. _site/results/
+          cp policy/mobile-crisis-adoption.csv _site/policy/
+          cat > _site/index.html <<'HTML'
+          <!doctype html>
+          <html lang="en">
+            <head>
+              <meta charset="utf-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1">
+              <meta http-equiv="refresh" content="0; url=site/dashboard.html">
+              <title>ED mental health wait-time dashboard</title>
+            </head>
+            <body><p><a href="site/dashboard.html">Open the ED mental health wait-time dashboard</a></p></body>
+          </html>
+          HTML
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
