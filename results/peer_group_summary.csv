@@ -1,0 +1,8 @@
+peer_group,hospitals,median_gap_minutes,gap_p25_minutes,gap_p75_minutes,median_psych_sample,peer_group_meets_minimum
+Acute Care Hospitals | Metro,1650,89.0,40.0,157.0,20.0,True
+Critical Access Hospitals | Nonmetro,637,70.0,39.0,123.0,16.0,True
+Acute Care Hospitals | Nonmetro,508,94.0,44.75,155.25,17.5,True
+Critical Access Hospitals | Metro,152,69.0,34.75,111.0,15.0,True
+Acute Care Hospitals | Unknown,73,73.0,23.0,149.0,23.0,True
+Critical Access Hospitals | Unknown,3,,,,37.0,False
+
