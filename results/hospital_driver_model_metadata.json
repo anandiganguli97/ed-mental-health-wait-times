@@ -1,0 +1,19 @@
+{
+  "n_hospitals": 3023,
+  "state_clusters": 53,
+  "design_columns": 66,
+  "r_squared_including_state_fixed_effects": 0.05744386904032439,
+  "residual_sd_minutes": 172.20271251165335,
+  "sample_threshold_both_components": 11,
+  "period_end": "2025-09-30",
+  "covariance": "CR1 state-clustered sandwich; normal-approximation 95% intervals and p-values",
+  "cms_dataset_id": "xubh-q36u",
+  "cms_metadata_url": "https://data.cms.gov/provider-data/api/1/metastore/schemas/dataset/items/xubh-q36u?show-reference-ids",
+  "cms_download_url": "https://data.cms.gov/provider-data/sites/default/files/resources/893c372430d9d71a1c52737d01239d47_1785189955/Hospital_General_Information.csv",
+  "rucc_download_url": "https://ers.usda.gov/media/5768/2023-rural-urban-continuum-codes.csv?v=35069",
+  "retrieved_utc": "2026-10-20T05:42:04.427610+00:00",
+  "joined_characteristics": 3023,
+  "county_rucc_match_share": 0.9748594111809461,
+  "cms_characteristics_as_of": "2026-10-20",
+  "interpretation": "Cross-sectional adjusted associations, not causal effects. Contemporary characteristics are joined only to the latest common OP-18 reporting period."
+}
