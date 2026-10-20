@@ -2,4 +2,7 @@
 title: "Hospital benchmark"
 ---
 
-Benchmark results will be published after validating the OP-18 strata, suppression codes, and uncertainty inputs. Raw ranks will be shown alongside uncertainty-aware estimates.
+The historical descriptive benchmark is available in [`results/national_historical_benchmark.md`](../results/national_historical_benchmark.md), with period-level and state-by-release summaries in `results/`. Hospital-level output retains scores, reported samples, footnotes, and missing/suppressed components under `data/processed/` after running the Python pipeline.
+
+The archive provides multiple annual and rolling periods. We do not publish empirical-Bayes estimates or rank hospitals yet: the public median and sample count do not reveal the patient-level spread needed to estimate the sampling variance of the hospital gap. CMS indicates sample sizes support confidence intervals for reported measures; a measure-specific procedure must be validated before using intervals for the difference of two medians.
+
