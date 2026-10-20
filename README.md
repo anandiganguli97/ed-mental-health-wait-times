@@ -12,14 +12,17 @@ An open, reproducible analysis of U.S. hospital emergency department time for ps
 2. **Drivers:** Which hospital and community characteristics are associated with larger gaps after accounting for state and year?
 3. **Policy:** Did adoption of Medicaid's ARPA mobile crisis benefit change psychiatric ED time relative to non-psychiatric ED time?
 
-OP-18 is a discharged-patient ED time measure. It is not a direct measure of admitted-patient boarding. CMS does not publish the visit counts and acuity information needed to fully assess precision or case mix; suppressed and small-cell values will be retained in the data-quality log and excluded from rankings unless a defensible uncertainty model can be built.
+OP-18 is a discharged-patient ED time measure. It is not a direct measure of admitted-patient boarding. The hospital dataset includes a `Sample` field, which will be assessed as a measure-specific case count; it is not assumed to represent total ED volume or case mix. Suppressed and small-sample values will be retained with their footnotes and excluded from unstable rankings unless a defensible uncertainty model can be built.
 
 ## Reproduce
 
-Install R (4.3 or newer) and run once to restore the locked package environment:
+Install R (4.3 or newer) and initialize the package environment. This workspace had no R installation, so the first `renv.lock` is not yet generated:
 
 ```r
 install.packages("renv")
+renv::init(bare = TRUE)
+renv::install(c("targets", "httr2", "jsonlite", "readr", "dplyr", "tidyr", "stringr", "lubridate", "quarto"))
+renv::snapshot()
 renv::restore()
 targets::tar_make()
 ```
@@ -33,7 +36,7 @@ The CMS pull is public and requires no API key. The supplied national summary is
 - `policy/mobile-crisis-adoption.csv` — state-level treatment dates, source and verification status.
 - `_targets.R`, `R/` — reproducible pipeline.
 - `site/` — Quarto narrative site, to be populated after validated estimates exist.
-- `renv.lock` — package lockfile, generated with `renv::snapshot()` on a machine with R.
+- `renv/README.md` — instructions to generate the initial lockfile; commit `renv.lock` after that first setup.
 
 ## Planned outputs
 

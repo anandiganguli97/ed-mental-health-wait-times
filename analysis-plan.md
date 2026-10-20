@@ -5,11 +5,11 @@
 
 ## Population and outcome
 
-The observational unit will be hospital (CCN) × reporting period. Primary outcome is the psychiatric stratum median ED arrival-to-departure time (OP-18c). The within-hospital contrast is OP-18c minus OP-18b, where OP-18b is the non-psychiatric/non-transfer stratum only if the contemporaneous CMS specification confirms that definition. OP-18a (all discharged patients) is secondary. The measure excludes patients who do not meet the measure's discharged-visit denominator; it must not be described as admitted-patient boarding.
+The observational unit will be hospital (CCN) × reporting period. Primary outcome is the psychiatric stratum median ED arrival-to-departure time (OP-18c). The within-hospital contrast is OP-18c minus OP-18b. CMS describes OP-18b as excluding psychiatric/mental health patients and transfers, so it is a non-psychiatric/non-transfer comparator, not every other ED visit. OP-18a (all patients, including psychiatric and transfer patients) and OP-18d (transfer patients) are secondary. These are discharged-visit measures; they must not be described as admitted-patient boarding.
 
 ## Layer 1: descriptive benchmark
 
-- Preserve CMS-reported periods, measure IDs, footnotes, suppression codes, and source release identifiers.
+- Preserve CMS-reported periods, measure IDs, footnotes, suppression codes, and source release identifiers. The Hospital dataset includes a `Sample` field; validate its exact meaning and completeness before using it as the measure-specific case count for uncertainty or sample-threshold rules. It is not assumed to equal total ED volume.
 - Compare raw hospital gaps to an empirical-Bayes/shrinkage estimate with interval. If CMS does not provide denominators or standard errors, do not invent precision from the median; estimate reliability only where defensible auxiliary counts/variance inputs are available. Otherwise show stratified raw distributions, suppress unstable ranks, and label the shrinkage model's assumptions.
 - Show sample-size sensitivity only when a valid denominator is available. Provide raw ordering next to uncertainty-aware estimates and rank movement.
 - No “best/worst hospital” claim; rankings are descriptive and not causal or risk-adjusted quality ratings.

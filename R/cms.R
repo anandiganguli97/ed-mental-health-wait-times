@@ -56,7 +56,8 @@ validate_cms_schema <- function(data) {
 }
 
 build_hospital_op18_panel <- function(data) {
-  data |>
+  validate_cms_schema(data)
+  op18 <- data |>
     dplyr::filter(.data$measure_id %in% c("OP_18a", "OP_18b", "OP_18c", "OP_18d")) |>
     dplyr::mutate(
       score_minutes = suppressWarnings(as.numeric(.data$score)),
@@ -68,6 +69,17 @@ build_hospital_op18_panel <- function(data) {
       facility_id, facility_name, state, countyparish, measure_id, score, score_minutes,
       sample, sample_n, footnote, start_date, end_date
     )
+  duplicates <- op18 |>
+    dplyr::count(.data$facility_id, .data$measure_id, .data$start_date, .data$end_date) |>
+    dplyr::filter(.data$n > 1L)
+  if (nrow(duplicates)) stop("Duplicate facility/measure/reporting-period records found; review before reshaping.")
+  op18 |>
+    tidyr::pivot_wider(
+      names_from = measure_id,
+      values_from = c(score, score_minutes, sample, sample_n, footnote),
+      names_glue = "{.value}_{measure_id}"
+    ) |>
+    dplyr::mutate(psych_gap_minutes = .data$score_minutes_OP_18c - .data$score_minutes_OP_18b)
 }
 
 read_national_reference <- function(path) {
