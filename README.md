@@ -1,5 +1,7 @@
 # ED mental health wait-time benchmark
 
+**[Open the live interactive dashboard](https://anandiganguli97.github.io/ed-mental-health-wait-times/site/dashboard.html)** · [Explore the source code](https://github.com/anandiganguli97/ed-mental-health-wait-times)
+
 An open, reproducible analysis of U.S. hospital emergency department time for psychiatric and mental health visits. The project is designed to answer three distinct questions: how hospitals compare, which hospital/community characteristics are associated with the gap, and whether state Medicaid mobile crisis coverage changed the gap.
 
 ## Status
@@ -60,4 +62,3 @@ CMS Timely and Effective Care (current and archived), CMS Hospital General Infor
 ## Data quality and interpretation
 
 See `data-quality-log.csv` and `analysis-plan.md`. Hospital identifiers will be standardized to CCN, but mergers, identifier changes, suppressed values, and measure-definition changes will be explicitly tracked. Estimates and rankings will be presented with uncertainty; no rank will be treated as a quality score.
-
