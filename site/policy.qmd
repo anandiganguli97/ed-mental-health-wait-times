@@ -2,4 +2,7 @@
 title: "Did mobile crisis coverage change ED time?"
 ---
 
-Policy results will be estimated only after state operational dates are verified from primary sources and the pre-trend/support checks are adequate.
+CMS confirms that 20 states plus the District of Columbia had approved Medicaid mobile-crisis state plan amendments by September 2024; New Jersey received approval later in 2024. Approval dates, SPA effective dates, and real-world service launch dates are not interchangeable. Some SPAs have retroactive effective dates, and the CMS approval record alone does not show when qualifying teams were operational across a state. [CMS approval announcement](https://www.cms.gov/newsroom/press-releases/cms-approves-new-hampshires-request-provide-essential-behavioral-health-services-through-mobile).
+
+The exploratory estimate below uses SPA effective dates as an intention-to-implement treatment. It does not estimate the effect of mobile-crisis teams actually operating statewide. Hospital-level changes in the OP-18c minus OP-18b gap are compared across staggered adoption cohorts, with state-cluster bootstrap intervals. The pooled event-time 0 estimate is +3.1 minutes (95% interval −9.3 to +15.8); the interval includes zero and does not establish that authorization had no effect. Only three cohort-time cells contribute at event time 0, the earliest cohort has four states, and the latest outcome period ends September 2025. See the [full method and limits](../results/mobile_crisis_policy_analysis.md), [event-time estimates](../results/mobile_crisis_event_study.csv), and [treatment-date audit](../policy/mobile-crisis-adoption.csv).
+
