@@ -100,8 +100,9 @@ def load_hospital_characteristics(cms_path: Path, rucc_path: Path, pos_path: Pat
     pos = pd.read_csv(pos_path, dtype=str, low_memory=False, encoding="cp1252")
     pos = pos.loc[pos["PRVDR_CTGRY_CD"].eq("01")].copy()
     pos["facility_id"] = pos["PRVDR_NUM"].astype(str).str.strip().str.zfill(6)
-    pos["county_fips"] = (pos["FIPS_STATE_CD"].fillna("").str.zfill(2)
-                           + pos["FIPS_CNTY_CD"].fillna("").str.zfill(3))
+    pos["county_fips"] = np.where(
+        pos["FIPS_STATE_CD"].notna() & pos["FIPS_CNTY_CD"].notna(),
+        pos["FIPS_STATE_CD"].str.zfill(2) + pos["FIPS_CNTY_CD"].str.zfill(3), "")
     for c in ["BED_CNT", "PSYCH_UNIT_BED_CNT"]:
         pos[c] = pd.to_numeric(pos[c], errors="coerce")
     pos = pos[["facility_id", "BED_CNT", "PSYCH_UNIT_BED_CNT", "county_fips"]].drop_duplicates("facility_id")
@@ -114,7 +115,9 @@ def load_hospital_characteristics(cms_path: Path, rucc_path: Path, pos_path: Pat
     county_hpsa = hpsa.groupby("county_fips", as_index=False).agg(
         mh_hpsa_designated=("mh_hpsa_designated", "max"), mh_hpsa_score=("HPSA Score", "max"))
     hosp = hosp.merge(county_hpsa, on="county_fips", how="left", validate="many_to_one")
-    hosp["mh_hpsa_designated"] = hosp["mh_hpsa_designated"].map({True: "Yes", False: "No"}).fillna("Unknown")
+    valid_fips = hosp["county_fips"].str.fullmatch(r"(?!00000)\d{5}")
+    hosp["mh_hpsa_designated"] = np.select(
+        [hosp["mh_hpsa_designated"].eq(True), valid_fips], ["Yes", "No"], default="Unknown")
     keep = ["facility_id", "facility_name", "state", "countyparish", "hospital_type", "hospital_ownership", "emergency_services", "FIPS", "rucc_2023", "rurality", "BED_CNT", "PSYCH_UNIT_BED_CNT", "county_fips", "mh_hpsa_designated", "mh_hpsa_score"]
     return hosp[keep].drop_duplicates("facility_id", keep="first")
 
@@ -248,6 +251,7 @@ def main() -> None:
                        "pos_psych_bed_match_share": float(data["PSYCH_UNIT_BED_CNT"].notna().mean()),
                        "county_mh_hpsa_match_share": float(data["mh_hpsa_designated"].ne("Unknown").mean()),
                        "county_mh_hpsa_designated_share": float(data["mh_hpsa_designated"].eq("Yes").mean()),
+                       "county_hpsa_no_record_coding": "A valid county FIPS with no currently designated HRSA geographic or high-needs geographic mental-health HPSA record is coded No; a missing/invalid county FIPS is Unknown.",
                        "cms_characteristics_as_of": meta["retrieved_utc"][:10],
                        "interpretation": "Cross-sectional adjusted associations, not causal effects. Contemporary characteristics are joined only to the latest common OP-18 reporting period."})
     (RESULTS / "hospital_driver_model_metadata.json").write_text(json.dumps(model_meta, indent=2), encoding="utf-8")
@@ -275,7 +279,7 @@ Peer groups are defined before looking at outcomes as CMS hospital type × USDA 
 
 ## Limitations
 
-The CMS Hospital General Information characteristics are current (retrieved {model_meta['cms_characteristics_as_of']}); the POS file describes 2026 Q2; HRSA HPSA designations are current at retrieval; and RUCC is a 2023 county classification. Covariate timing therefore does not exactly match the September 2025 outcome, and hospital conditions may have changed. Psychiatric-unit beds are CMS unit-bed counts, not a census of inpatient psychiatric capacity at nearby facilities. HPSA is a county-level geographic designation, not a hospital-specific workforce measure. There is no causal identification, no adjustment for patient acuity, and no validated uncertainty model for the median gap. Refresh files and audit coverage before reuse.
+The CMS Hospital General Information characteristics are current (retrieved {model_meta['cms_characteristics_as_of']}); the POS file describes 2026 Q2; HRSA HPSA designations are current at retrieval; and RUCC is a 2023 county classification. Covariate timing therefore does not exactly match the September 2025 outcome, and hospital conditions may have changed. Psychiatric-unit beds are CMS unit-bed counts, not a census of inpatient psychiatric capacity at nearby facilities. HPSA is a county-level geographic designation, not a hospital-specific workforce measure; a valid county FIPS with no currently designated geographic or high-needs geographic record is coded “No,” and the full indicator coverage is {model_meta['county_mh_hpsa_match_share']:.1%}. There is no causal identification, no adjustment for patient acuity, and no validated uncertainty model for the median gap. Refresh files and audit coverage before reuse.
 
 Sources: [CMS Hospital General Information](https://data.cms.gov/provider-data/dataset/xubh-q36u), [CMS Provider of Services](https://data.cms.gov/provider-characteristics/hospitals-and-other-facilities/provider-of-services-file-quality-improvement-and-evaluation-system), [HRSA mental-health HPSA downloads](https://data.hrsa.gov/data/download?AHRF=&data=AHRF), and [USDA 2023 Rural-Urban Continuum Codes](https://www.ers.usda.gov/data-products/rural-urban-continuum-codes/).
 """

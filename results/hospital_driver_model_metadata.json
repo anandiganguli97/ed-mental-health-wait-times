@@ -1,9 +1,9 @@
 {
   "n_hospitals": 3023,
   "state_clusters": 53,
-  "design_columns": 68,
-  "r_squared_including_state_fixed_effects": 0.05818958233101745,
-  "residual_sd_minutes": 172.1928211500871,
+  "design_columns": 67,
+  "r_squared_including_state_fixed_effects": 0.057994115422012604,
+  "residual_sd_minutes": 172.1815575279993,
   "sample_threshold_both_components": 11,
   "period_end": "2025-09-30",
   "covariance": "CR1 state-clustered sandwich; normal-approximation 95% intervals and p-values",
@@ -21,8 +21,9 @@
   "county_rucc_match_share": 0.9748594111809461,
   "pos_bed_count_match_share": 1.0,
   "pos_psych_bed_match_share": 1.0,
-  "county_mh_hpsa_match_share": 0.7558716506781343,
+  "county_mh_hpsa_match_share": 1.0,
   "county_mh_hpsa_designated_share": 0.4263976182600066,
+  "county_hpsa_no_record_coding": "A valid county FIPS with no currently designated HRSA geographic or high-needs geographic mental-health HPSA record is coded No; a missing/invalid county FIPS is Unknown.",
   "cms_characteristics_as_of": "2026-10-20",
   "interpretation": "Cross-sectional adjusted associations, not causal effects. Contemporary characteristics are joined only to the latest common OP-18 reporting period."
 }
