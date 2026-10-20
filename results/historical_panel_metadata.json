@@ -1,0 +1,22 @@
+{
+  "source": "CMS Provider Data Catalog Hospitals archived annual snapshot files",
+  "archive_url": "https://data.cms.gov/provider-data/archived-data/hospitals",
+  "retrieved_utc": "2026-10-20T05:37:33.200143+00:00",
+  "first_release_date": "2019-03-04",
+  "latest_release_with_op18_date": "2026-08-13",
+  "snapshot_count": 31,
+  "hospital_snapshot_period_rows": 145833,
+  "distinct_hospitals_across_snapshots": 5157,
+  "periods_missing_gap": 53969,
+  "latest_reporting_period_start": "2024-10-01",
+  "latest_reporting_period_end": "2025-09-30",
+  "latest_hospitals_in_extract": 4658,
+  "latest_hospitals_with_both_measures": 3023,
+  "latest_hospital_median_gap_minutes": 83.0,
+  "latest_gap_p25_minutes": 39.0,
+  "latest_gap_p75_minutes": 146.0,
+  "latest_op18c_sample_median": 19.0,
+  "latest_op18c_sample_minimum": 11.0,
+  "sample_field_note": "CMS describes the public Sample field for eligible hospital patients and notes that hospitals may sample under CMS rules. The count does not provide the patient-level dispersion needed to recover a median's sampling uncertainty.",
+  "interpretation": "Descriptive discharged-visit measure; OP-18b excludes psychiatric and transfer patients. No causal or case-mix-adjusted interpretation."
+}
