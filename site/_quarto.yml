@@ -1,0 +1,19 @@
+project:
+  type: website
+  output-dir: _site
+website:
+  title: "ED mental health wait-time benchmark"
+  navbar:
+    left:
+      - href: index.qmd
+        text: Overview
+      - href: benchmark.qmd
+        text: Benchmark
+      - href: drivers.qmd
+        text: Drivers
+      - href: policy.qmd
+        text: Policy
+format:
+  html:
+    theme: cosmo
+    toc: true

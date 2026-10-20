@@ -1,0 +1,9 @@
+---
+title: "Psychiatric ED time: a national hospital benchmark"
+---
+
+This site will report a national, hospital-level analysis of public CMS emergency department time measures. Estimates will be added after source definitions, historical comparability, and uncertainty are validated.
+
+**Current status:** data pipeline scaffold; no estimates published.
+
+The reported CMS measure covers discharged ED visits and should not be interpreted as boarding time for admitted patients.

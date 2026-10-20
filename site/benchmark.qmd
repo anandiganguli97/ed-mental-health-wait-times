@@ -1,0 +1,5 @@
+---
+title: "Hospital benchmark"
+---
+
+Benchmark results will be published after validating the OP-18 strata, suppression codes, and uncertainty inputs. Raw ranks will be shown alongside uncertainty-aware estimates.

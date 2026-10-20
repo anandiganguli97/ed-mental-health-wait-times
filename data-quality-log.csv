@@ -1,0 +1,9 @@
+date,source,issue,decision,status,notes
+2026-10-20,CMS Provider Data Catalog,Current Timely and Effective Care - Hospital dataset ID yv7e-xc69,Use provider-level dataset for hospital benchmark,confirmed,Official catalog lists facility ID/name/state/county/measure/score/sample/footnote/reporting dates
+2026-10-20,CMS Timely and Effective Care National CSV,National file contains aggregate measure rows and no hospital identifier,Use only as a period-level national reference; do not rank hospitals,confirmed,OP-18c 257 minutes minus OP-18b 162 minutes equals 95 minutes for 2024-10-01 through 2025-09-30
+2026-10-20,CMS national measure footnotes,National OP-18b carries codes 25 and 26; OP-18c carries code 25,Retain footnotes and document differing VHA/DoD inclusion,confirmed,Footnote 25 indicates VHA data included; footnote 26 indicates DoD data included
+2026-10-20,CMS Provider Data Catalog,Historical releases and archive structure,Ingest separately by release and preserve release metadata,open,Do not assume current dataset contains full quarterly history
+2026-10-20,CMS OP-18 measure specification,Comparison stratum definition and transfer handling,Confirm from contemporaneous technical specification before labeling OP-18b comparator,open,Do not assume OP-18b equals all non-psychiatric patients
+2026-10-20,CMS OP-18 measure data,Counts and suppressed/small-cell values,Retain footnotes and missingness codes; do not rank suppressed records,open,Determine whether denominators/SEs are public
+2026-10-20,Hospital identifiers,CCN changes and mergers,Maintain explicit dated crosswalk; do not auto-collapse identities,open,Source and validate crosswalk before panel joins
+2026-10-20,Medicaid mobile crisis policy,Planned vs actual implementation dates,Use actual effective/operational date from primary source,open,Hand-verified state table required

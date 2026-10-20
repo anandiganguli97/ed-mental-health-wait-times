@@ -1,0 +1,14 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+renv/library/
+renv/staging/
+renv/python/
+data/raw/*
+!data/raw/Timely_and_Effective_Care-National.csv
+data/processed/*
+!data/processed/.gitkeep
+site/_site/
+_targets/
+*.tar.gz

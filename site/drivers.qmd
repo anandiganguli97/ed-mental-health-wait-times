@@ -1,0 +1,5 @@
+---
+title: "What is associated with the gap?"
+---
+
+Adjusted associations and peer groups will be added after the hospital-period panel and covariate joins pass documented quality checks.
