@@ -1,1 +1,24 @@
 state,spa_or_authority_id,approval_date,effective_date,operational_date,treatment_date,source_url,verification_status,notes
+AL,AL-23-0009,2023-11-20,2023-10-01,,2023-10-01,https://www.medicaid.gov/medicaid/spa/downloads/AL-23-0009.pdf,CMS SPA date verified; operational date unverified,Effective date defines policy authorization cohort
+AZ,AZ-22-0008,2022-09-23,2022-04-01,,2022-04-01,https://www.medicaid.gov/medicaid/spa/downloads/AZ-22-0008.pdf,CMS SPA date verified; operational date unverified,Effective date defines policy authorization cohort
+CA,CA-22-0043,2023-07-20,2023-01-01,,2023-01-01,https://www.medicaid.gov/medicaid/spa/downloads/CA-22-0043.pdf,CMS SPA date verified; operational date unverified,Effective date defines policy authorization cohort
+CO,CO-23-0008,2023-12-04,2023-07-01,,2023-07-01,https://www.medicaid.gov/medicaid/spa/downloads/CO-23-0008.pdf,CMS SPA date verified; operational date unverified,Effective date defines policy authorization cohort
+DC,DC-23-0007,2023-09-08,2023-08-01,,2023-08-01,https://www.medicaid.gov/medicaid/spa/downloads/DC-23-0007.pdf,CMS SPA date verified; operational date unverified,Effective date defines policy authorization cohort
+IN,IN-23-0007,2023-09-19,2023-07-01,,2023-07-01,https://www.medicaid.gov/medicaid/spa/downloads/IN-23-0007.pdf,CMS SPA date verified; operational date unverified,Effective date defines policy authorization cohort
+KY,KY-23-0003,2023-05-15,2023-01-01,,2023-01-01,https://www.medicaid.gov/medicaid/spa/downloads/KY-23-0003.pdf,CMS SPA date verified; operational date unverified,Effective date defines policy authorization cohort
+LA,LA-23-0044,2024-03-05,2024-04-01,,2024-04-01,https://www.medicaid.gov/medicaid/spa/downloads/LA-23-0044.pdf,CMS SPA date verified; operational date unverified,Effective date defines policy authorization cohort
+MA,MA-23-0015,2023-09-29,2023-01-01,,2023-01-01,https://www.medicaid.gov/medicaid/spa/downloads/MA-23-0015.pdf,CMS SPA date verified; operational date unverified,Effective date defines policy authorization cohort
+MD,MD-24-0001,2024-04-15,2024-05-01,,2024-05-01,https://www.medicaid.gov/medicaid/spa/downloads/MD-24-0001.pdf,CMS SPA date verified; operational date unverified,Effective date defines policy authorization cohort
+MT,MT-23-0006,2023-10-17,2023-07-01,,2023-07-01,https://www.medicaid.gov/medicaid/spa/downloads/MT-23-0006.pdf,CMS SPA date verified; operational date unverified,Effective date defines policy authorization cohort
+NC,NC-22-0019,2022-10-26,2022-07-01,,2022-07-01,https://www.medicaid.gov/medicaid/spa/downloads/NC-22-0019.pdf,CMS SPA date verified; operational date unverified,Effective date defines policy authorization cohort
+NH,NH-24-0021,2024-09-12,2024-04-01,,2024-04-01,https://www.medicaid.gov/medicaid/spa/downloads/NH-24-0021.pdf,CMS SPA date verified; operational date unverified,Effective date defines policy authorization cohort
+NJ,NJ-24-0021,2024-12-12,2024-12-23,,2024-12-23,https://www.medicaid.gov/medicaid/spa/downloads/NJ-24-0021.pdf,CMS SPA date verified; operational date unverified,Effective date defines policy authorization cohort
+NM,NM-23-0006,2024-02-06,2023-07-01,,2023-07-01,https://www.medicaid.gov/medicaid/spa/downloads/NM-23-0006.pdf,CMS SPA date verified; operational date unverified,Effective date defines policy authorization cohort
+NY,NY-22-0026,2023-06-29,2022-04-01,,2022-04-01,https://www.medicaid.gov/medicaid/spa/downloads/NY-22-0026.pdf,CMS SPA date verified; operational date unverified,Effective date defines policy authorization cohort
+NV,NV-22-0005,2024-07-29,2023-07-01,,2023-07-01,https://www.medicaid.gov/medicaid/spa/downloads/NV-22-0005.pdf,CMS SPA date verified; operational date unverified,Section 1947 service effective date is 2023-07-01 as stated within the SPA
+OR,OR-22-0012,2022-09-12,2022-04-01,,2022-04-01,https://www.medicaid.gov/medicaid/spa/downloads/OR-22-0012.pdf,CMS SPA date verified; operational date unverified,Effective date defines policy authorization cohort
+VT,VT-24-0005,2024-04-04,2024-01-01,,2024-01-01,https://www.medicaid.gov/medicaid/spa/downloads/VT-24-0005.pdf,CMS SPA date verified; operational date unverified,Effective date defines policy authorization cohort
+WA,WA-23-0010,2023-10-10,2024-01-01,,2024-01-01,https://www.medicaid.gov/medicaid/spa/downloads/WA-23-0010.pdf,CMS SPA date verified; operational date unverified,Effective date defines policy authorization cohort
+WI,WI-23-0001,2023-05-12,2023-01-01,,2023-01-01,https://www.medicaid.gov/medicaid/spa/downloads/WI-23-0001.pdf,CMS SPA date verified; operational date unverified,Effective date defines policy authorization cohort
+WV,WV-23-0003,2023-09-05,2023-07-01,,2023-07-01,https://www.medicaid.gov/medicaid/spa/downloads/WV-23-0003.pdf,CMS SPA verified; state administrative policy date documented,State BMS reported implementation policies effective 2024-02-01; not evidence of statewide team availability
+
