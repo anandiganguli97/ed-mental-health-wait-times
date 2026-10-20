@@ -103,3 +103,4 @@ summarize_national_op18 <- function(data) {
   list(measures = selected, national_gap_minutes = psychiatric - comparator,
        interpretation = "National reference only; not a hospital benchmark or causal estimate.")
 }
+
