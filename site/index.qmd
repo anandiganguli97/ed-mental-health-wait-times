@@ -6,6 +6,8 @@ This site reports a descriptive benchmark from 31 archived CMS hospital releases
 
 See the [historical benchmark](../results/national_historical_benchmark.md), [hospital driver analysis](../results/hospital_driver_analysis.md), [peer groups](../results/peer_group_summary.csv), and [state summary](../results/state_op18_gap_summary.csv).
 
+Use the [interactive hospital lookup](hospital_lookup.html) to search by hospital name, CMS ID, state, and peer group.
+
 This is an unweighted descriptive hospital statistic. The median gap was 76 minutes in calendar 2018, rose to 90 in 2022, then was 83 in 2024 and in the latest 12-month period. A pandemic-overlap reporting window reached 96 minutes. Periods overlap, so these figures do not establish causes. The national CMS aggregate gap is 95 minutes and is a different summary statistic. OP-18 covers discharged ED visits; it does not measure boarding time for admitted patients. Missing/suppressed scores and limits on median uncertainty still constrain modeling.
 
 CMS finalized removal of its Median Time for Discharged ED Patients measure beginning with the 2028 reporting period, while the Emergency Care Access & Timeliness eCQM is voluntary in 2027 and mandatory in 2028. This historical OP-18 panel is a pre-transition baseline, not a direct crosswalk to the new eCQM. See the [CMS 2026 OPPS final-rule fact sheet](https://www.cms.gov/newsroom/fact-sheets/calendar-year-2026-hospital-outpatient-prospective-payment-system-opps-ambulatory-surgical-center).
