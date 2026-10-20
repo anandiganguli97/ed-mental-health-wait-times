@@ -17,3 +17,4 @@ list(
   tar_target(national_reference, read_national_reference(national_reference_file)),
   tar_target(national_op18_summary, summarize_national_op18(national_reference))
 )
+
