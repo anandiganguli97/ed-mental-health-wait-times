@@ -1,24 +1,28 @@
-# ED mental health wait-time benchmark
+# Mental-health emergency department time in U.S. hospitals
 
-**[Open the live interactive dashboard](https://anandiganguli97.github.io/ed-mental-health-wait-times/site/dashboard.html)** · [Explore the source code](https://github.com/anandiganguli97/ed-mental-health-wait-times)
+![Median hospital gap across selected annual reporting periods](results/figures/national-gap-trend.svg)
 
-An open, reproducible analysis of U.S. hospital emergency department time for psychiatric and mental health visits. The project is designed to answer three distinct questions: how hospitals compare, which hospital/community characteristics are associated with the gap, and whether state Medicaid mobile crisis coverage changed the gap.
+CMS data show a persistent difference between reported emergency department times for discharged psychiatric visits and the non-psychiatric, non-transfer comparison group. The latest common hospital reporting period covered October 2024–September 2025.
 
-## Status
+## Three findings
 
-**Historical benchmark, first driver and peer analyses, and an exploratory mobile-crisis authorization analysis are complete.** We assembled 31 archived CMS releases spanning reporting periods from 2017 through Sep. 30, 2025, with 145,833 hospital-snapshot records. In the latest OP-18 release, both OP-18b and OP-18c were available for 3,023 hospitals; the median hospital gap was 83 minutes (IQR 39–146). Calendar-year medians rose from 76 minutes in 2018 to 90 in 2022, then fell to 83 in 2024; the latest 12-month period through Sep. 2025 was also 83 minutes. These comparisons are descriptive and reporting windows overlap. See [`results/national_historical_benchmark.md`](results/national_historical_benchmark.md), [`results/national_op18_period_summary.csv`](results/national_op18_period_summary.csv), and the state summaries. The latest-period driver model uses current hospital characteristics and 2023 county rurality, with state fixed effects; the results are associations, not causal effects. Peer groups are based on hospital type and metro status. The policy estimate uses SPA effective dates as authorization timing, not verified statewide service launch; event-time zero is +3.1 minutes (state-cluster bootstrap 95% interval −9.3 to +15.8) and is highly limited by adoption cohort support. The local and GitHub reproducible pipeline uses Python; R files remain an optional scaffold.
+1. **The typical hospital reported an 83-minute gap.** Across 3,023 hospitals with both measures, the median difference was 83 minutes (IQR 39–146).
+2. **The driver result depends on specification.** In the baseline model, Critical Access Hospitals had a gap 17.3 minutes lower than acute care hospitals (95% CI 7.3–27.2 minutes lower). Adding certified beds, psychiatric-unit beds, and county HPSA reduced the estimate to 12.3 minutes lower (95% CI 27.9 lower to 3.3 higher). Both are exploratory associations; the expanded-model interval includes zero.
+3. **The mobile-crisis authorization analysis remains inconclusive.** Using Medicaid SPA effective dates, event time zero was +3.1 minutes (state-cluster bootstrap 95% interval −9.2 to +15.7). Pre-period estimates and the later approval-date sensitivity are reported alongside it; small cohort support limits interpretation.
 
-Read the integrated [executive brief](results/executive_brief.md) for a concise summary of findings and interpretation.
+## Why this matters
 
-Open the [interactive dashboard](site/dashboard.html) for the national trend, state and peer comparisons, model estimates, policy event study, and hospital search. The [hospital lookup](site/hospital_lookup.html) is also available as a focused search page. Regenerate them with `python python/build_dashboard.py` and `python python/build_hospital_lookup.py` after rebuilding the analysis outputs.
+These results can help hospitals and health systems decide where to investigate their own behavioral-health ED pathways. They do not tell a CMO how long an individual patient waited, whether a patient boarded after admission, or which hospital provides better care. The measure covers discharged ED visits and compares two separately reported hospital medians.
 
-## Questions
+**[Open the interactive dashboard](https://anandiganguli97.github.io/ed-mental-health-wait-times/site/dashboard.html)** for the national trend, state and peer comparisons, model estimates, event study, and hospital search. The [hospital lookup](https://anandiganguli97.github.io/ed-mental-health-wait-times/site/hospital_lookup.html) is also available.
 
-1. **Benchmark:** What is each hospital's OP-18c minus OP-18b median-time gap, and how much do raw rankings change after uncertainty-aware shrinkage? The raw hospital-period gaps are built. Shrinkage and rankings await a validated uncertainty method for the difference of medians; none are published yet.
-2. **Drivers:** A latest-period cross-sectional model estimates associations with hospital type, ownership, emergency services, and rurality. Historical, staffing, bed-supply, and safety-net covariates remain unavailable in the current model.
-3. **Policy:** An exploratory group-time ATT analysis estimates SPA authorization timing; most operational dates are unknown, so it is not an effect estimate of actual service availability. Short follow-up and few states in early cohorts make the findings tentative.
+## Analysis and limitations
 
-OP-18 is a discharged-patient ED time measure. It is not a direct measure of admitted-patient boarding. CMS's `Sample` field is retained as the measure-specific sampled-patient count, not as total ED volume or a case-mix adjustment. The current report includes transparent minimum-sample sensitivity checks; it does not claim that a threshold removes bias or use the sample count alone to construct intervals for the difference of medians.
+The project harmonizes 31 archived CMS releases (145,833 hospital-snapshot rows), preserving reporting periods, release dates, measure identifiers, sampled-patient counts, and footnotes. Descriptive hospital comparisons use a minimum sample threshold of 11 in each measure. Raising the threshold changes the hospitals represented: the median gap is 83 minutes at 11, 93 at 20, and 67 at 100. This is selection into different hospital groups, not evidence that larger samples remove measurement noise.
+
+An exploratory empirical-Bayes model uses repeated annual windows to estimate how hospital gaps vary across years by sample size. In held-out-year prediction, shrinkage reduced RMSE by 2.7% for 2024 and 1.4% for 2025. Annual residual variation includes genuine hospital change as well as measurement error; these estimates are not validated sampling variances or confidence intervals for a difference of medians, and no hospital rankings are published from them.
+
+The expanded driver model explains 5.8% of observed gap variation. It now includes CMS certified beds and psychiatric-unit beds, plus a county-level mental-health HPSA designation; HPSA is available for 76% of model hospitals and is not a hospital-specific workforce measure. These additions use 2026 sources against a 2025 outcome, so timing is imperfect. The policy analysis estimates SPA authorization timing, not verified statewide mobile-crisis operations. OP-18 is not an admitted-patient boarding measure. The current measure is being replaced by a new CMS emergency care access and timeliness measure, so the historical series is not a validated crosswalk to its successor.
 
 ## Reproduce
 
@@ -29,36 +33,23 @@ python -m pip install -r python/requirements.txt
 python python/download_and_build_panel.py
 python python/build_historical_panel.py
 python python/build_hospital_drivers.py
+python python/build_shrinkage_benchmark.py
 python python/build_mobile_crisis_did.py
 python python/build_hospital_lookup.py
 python python/build_dashboard.py
 ```
 
-The current-release script uses CMS metadata to resolve the hospital CSV download. The archive script downloads CMS annual hospital archives (about 500 MB in total for 2019–2026), reads quarterly snapshots, adapts the early CMS column-name changes, retains OP-18a/b/c/d scores and footnotes, and builds the longitudinal hospital panel. The driver script downloads current CMS Hospital General Information and USDA 2023 Rural-Urban Continuum Codes and creates the latest-period model and peer summaries. Raw CMS downloads and hospital-level panels are ignored by Git; aggregate result files are committed. `R/` and `_targets.R` are an optional scaffold and have not been executed in this environment.
+The archive script retrieves CMS annual hospital archives, adapts early column-name changes, and builds the longitudinal OP-18 panel. The driver script joins current CMS Hospital General Information and USDA 2023 Rural-Urban Continuum Codes to the latest period only. Raw downloads and hospital-level panels are excluded from Git; aggregate outputs are committed. The GitHub Pages workflow rebuilds the dashboard from these committed results before publishing.
 
 ## Repository map
 
-- `analysis-plan.md` — pre-analysis decisions and causal design, dated before model fitting.
-- `data-quality-log.csv` — source, transformation, suppression, definition and linkage decisions.
-- `policy/mobile-crisis-adoption.csv` — state-level treatment dates, source and verification status.
-- `python/` — executed current-release and archived-snapshot download/analysis pipelines.
-- `_targets.R`, `R/` — optional R scaffold; not the current source of truth.
-- `results/` — descriptive national benchmark and state summary.
-- `site/` — Quarto narrative site with benchmark, driver and policy results and their limitations.
-- `renv/README.md` — instructions to generate the initial lockfile; commit `renv.lock` after that first setup.
-
-## Planned outputs
-
-1. Historical descriptive national and state summaries (completed; no rankings).
-2. Uncertainty-aware benchmark, after validating a median-gap interval or an explicitly caveated shrinkage model.
-3. Peer-group comparisons and mixed-model associations.
-4. Exploratory staggered-adoption event study using SPA effective dates as an intention-to-implement measure; operational service dates remain unknown for most states.
-5. Nontechnical hospital/state brief and technical appendix.
+- `analysis-plan.md` — analysis decisions and dated decision log.
+- `data-quality-log.csv` — source, transformation, suppression, and linkage decisions.
+- `policy/mobile-crisis-adoption.csv` — state policy dates, sources, and verification status.
+- `python/` — data preparation and analysis scripts.
+- `results/` — reports, aggregate tables, model outputs, and chart.
+- `site/` — dashboard and rendered analysis pages.
 
 ## Data sources
 
-CMS Timely and Effective Care (current and archived), CMS Hospital General Information, and USDA Rural-Urban Continuum Codes are currently used. CMS Provider of Services / inpatient psychiatric facility files, HRSA HPSA, Area Health Resources Files, Census ACS, and a primary-source-verified state mobile crisis adoption table remain planned. The project will not use N-SUMHSS work-adjacent data.
-
-## Data quality and interpretation
-
-See `data-quality-log.csv` and `analysis-plan.md`. Hospital identifiers will be standardized to CCN, but mergers, identifier changes, suppressed values, and measure-definition changes will be explicitly tracked. Estimates and rankings will be presented with uncertainty; no rank will be treated as a quality score.
+CMS Timely and Effective Care (current and archived), CMS Hospital General Information, the 2026 Q2 CMS Provider of Services file, the current HRSA mental-health HPSA file, USDA Rural-Urban Continuum Codes, and state Medicaid SPA documents are used. The CMS psychiatric-unit-bed field is a facility-specific unit count; the county HPSA indicator is a geographic designation, not a direct measure of hospital staffing or nearby bed capacity.

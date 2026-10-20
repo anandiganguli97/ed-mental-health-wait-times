@@ -18,6 +18,12 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Rebuild interactive dashboard
+        run: python python/build_dashboard.py
       - name: Assemble Pages artifact
         shell: bash
         run: |
@@ -52,4 +58,3 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
-

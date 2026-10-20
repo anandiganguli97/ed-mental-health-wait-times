@@ -1,0 +1,176 @@
+{
+  "model": "exploratory empirical-Bayes normal-means shrinkage, residual variance a + b/sample_n",
+  "target": "hospital-level OP-18c minus OP-18b gap in 2025 reporting window",
+  "sample_threshold": 11,
+  "years": [
+    2018,
+    2020,
+    2021,
+    2022,
+    2023,
+    2024,
+    2025
+  ],
+  "variance_source": "within-hospital deviations after additive year effects in repeated annual, non-overlapping windows",
+  "interpretation_limit": "annual residual variation includes real hospital changes and measurement noise; it is not a validated sampling variance or confidence interval for a median difference",
+  "noise_variance_intercept": 1140.9594264017392,
+  "noise_variance_reciprocal_sample_slope": 36788.97195918275,
+  "between_hospital_variance": 13337.310098639802,
+  "noise_bins": [
+    {
+      "sample_bin": "11-19",
+      "n_rows": 8671,
+      "median_sample": 15.0,
+      "residual_scale_minutes": 52.881229050093076,
+      "residual_variance_minutes2": 2796.424385848408
+    },
+    {
+      "sample_bin": "20-29",
+      "n_rows": 4821,
+      "median_sample": 23.0,
+      "residual_scale_minutes": 56.747272885161166,
+      "residual_variance_minutes2": 3220.2529799029476
+    },
+    {
+      "sample_bin": "30-49",
+      "n_rows": 2383,
+      "median_sample": 35.0,
+      "residual_scale_minutes": 57.964782267583985,
+      "residual_variance_minutes2": 3359.915983328419
+    },
+    {
+      "sample_bin": "50-99",
+      "n_rows": 739,
+      "median_sample": 63.0,
+      "residual_scale_minutes": 44.70771646809302,
+      "residual_variance_minutes2": 1998.7799117913958
+    },
+    {
+      "sample_bin": "100-199",
+      "n_rows": 192,
+      "median_sample": 126.5,
+      "residual_scale_minutes": 31.379319976423922,
+      "residual_variance_minutes2": 984.6617221827973
+    },
+    {
+      "sample_bin": "200+",
+      "n_rows": 221,
+      "median_sample": 357.0,
+      "residual_scale_minutes": 23.807097695527933,
+      "residual_variance_minutes2": 566.7779006844114
+    }
+  ],
+  "validation": [
+    {
+      "test_year": 2024,
+      "train_rows": 14032,
+      "test_hospitals": 2908,
+      "noise_variance_intercept": 1201.456505412642,
+      "noise_variance_reciprocal_sample_slope": 29612.914295767783,
+      "between_hospital_variance": 15778.514288502814,
+      "unshrunk_rmse_minutes": 134.43921178197297,
+      "shrunk_rmse_minutes": 130.7696795930721,
+      "rmse_change_percent": -2.729510341708885,
+      "noise_bins": [
+        {
+          "sample_bin": "11-19",
+          "n_rows": 7078,
+          "median_sample": 15.0,
+          "residual_scale_minutes": 49.74538839754793,
+          "residual_variance_minutes2": 2474.603666822896
+        },
+        {
+          "sample_bin": "20-29",
+          "n_rows": 3976,
+          "median_sample": 23.0,
+          "residual_scale_minutes": 52.896434225493884,
+          "residual_variance_minutes2": 2798.032753772001
+        },
+        {
+          "sample_bin": "30-49",
+          "n_rows": 2022,
+          "median_sample": 35.0,
+          "residual_scale_minutes": 56.07260870258715,
+          "residual_variance_minutes2": 3144.137446713452
+        },
+        {
+          "sample_bin": "50-99",
+          "n_rows": 628,
+          "median_sample": 63.0,
+          "residual_scale_minutes": 46.18667819550926,
+          "residual_variance_minutes2": 2133.2092427355306
+        },
+        {
+          "sample_bin": "100-199",
+          "n_rows": 151,
+          "median_sample": 125.0,
+          "residual_scale_minutes": 32.145256240645296,
+          "residual_variance_minutes2": 1033.3174987767454
+        },
+        {
+          "sample_bin": "200+",
+          "n_rows": 177,
+          "median_sample": 359.0,
+          "residual_scale_minutes": 22.861994400583285,
+          "residual_variance_minutes2": 522.6707879723015
+        }
+      ]
+    },
+    {
+      "test_year": 2025,
+      "train_rows": 17027,
+      "test_hospitals": 2933,
+      "noise_variance_intercept": 1140.9594264017392,
+      "noise_variance_reciprocal_sample_slope": 36788.97195918275,
+      "between_hospital_variance": 13337.310098639802,
+      "unshrunk_rmse_minutes": 171.1567721630191,
+      "shrunk_rmse_minutes": 168.79433661617506,
+      "rmse_change_percent": -1.3802758237307255,
+      "noise_bins": [
+        {
+          "sample_bin": "11-19",
+          "n_rows": 8671,
+          "median_sample": 15.0,
+          "residual_scale_minutes": 52.881229050093076,
+          "residual_variance_minutes2": 2796.424385848408
+        },
+        {
+          "sample_bin": "20-29",
+          "n_rows": 4821,
+          "median_sample": 23.0,
+          "residual_scale_minutes": 56.747272885161166,
+          "residual_variance_minutes2": 3220.2529799029476
+        },
+        {
+          "sample_bin": "30-49",
+          "n_rows": 2383,
+          "median_sample": 35.0,
+          "residual_scale_minutes": 57.964782267583985,
+          "residual_variance_minutes2": 3359.915983328419
+        },
+        {
+          "sample_bin": "50-99",
+          "n_rows": 739,
+          "median_sample": 63.0,
+          "residual_scale_minutes": 44.70771646809302,
+          "residual_variance_minutes2": 1998.7799117913958
+        },
+        {
+          "sample_bin": "100-199",
+          "n_rows": 192,
+          "median_sample": 126.5,
+          "residual_scale_minutes": 31.379319976423922,
+          "residual_variance_minutes2": 984.6617221827973
+        },
+        {
+          "sample_bin": "200+",
+          "n_rows": 221,
+          "median_sample": 357.0,
+          "residual_scale_minutes": 23.807097695527933,
+          "residual_variance_minutes2": 566.7779006844114
+        }
+      ]
+    }
+  ],
+  "validation_rule": "predict each held-out year's hospital deviation from prior years and compare RMSE with the unshrunk prior-year mean; this validates prediction only, not patient-level uncertainty"
+}

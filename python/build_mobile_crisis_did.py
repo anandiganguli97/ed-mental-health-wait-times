@@ -87,8 +87,8 @@ def bootstrap_weights(states, rng):
     return dict(zip(values.tolist(), counts.astype(int).tolist()))
 
 
-def estimate(d, periods, policy):
-    tdates = dict(zip(policy.state, policy.treatment_date))
+def estimate(d, periods, policy, date_column="effective_date"):
+    tdates = dict(zip(policy.state, pd.to_datetime(policy[date_column], errors="coerce")))
     observed_states = sorted(d.state.dropna().unique())
     cohorts = {}
     for state in observed_states:
@@ -144,13 +144,15 @@ def estimate(d, periods, policy):
     gt = pd.DataFrame(records)
     post = gt.loc[gt.status.eq("post-policy group-time ATT") & gt.att_minutes.notna()].copy()
     dynamic_rows = []
-    for event_time, frame in post.groupby("event_time"):
+    supported = gt.loc[gt.att_minutes.notna()].copy()
+    for event_time, frame in supported.groupby("event_time"):
         frame = frame.copy()
         frame["weight"] = frame.groupby("cohort").treated_hospitals.transform("first").astype(float)
         point = float(np.average(frame.att_minutes, weights=frame.weight))
+        dynamic_rng = np.random.default_rng(SEED + int(event_time))
         boots = []
         for _ in range(N_BOOT):
-            w = bootstrap_weights(observed_states, rng)
+            w = bootstrap_weights(observed_states, dynamic_rng)
             effects, weights = [], []
             for row in frame.itertuples(index=False):
                 tr, co = cache[(int(row.cohort), int(row.report_end_year))]
@@ -161,11 +163,13 @@ def estimate(d, periods, policy):
             if effects:
                 boots.append(float(np.average(effects, weights=weights)))
         low, high = np.quantile(boots, [.025, .975]) if len(boots) >= 100 else (np.nan, np.nan)
-        dynamic_rows.append(dict(event_time=int(event_time), att_minutes=point,
+        dynamic_rows.append(dict(event_time=int(event_time), period_type=("pre-period diagnostic" if frame.status.eq("pre-trend diagnostic").all() else "post-policy"), att_minutes=point,
                                  ci95_low=float(low), ci95_high=float(high),
                                  cohort_time_cells=len(frame),
                                  min_treated_states=int(frame.treated_states.min()),
-                                 min_control_states=int(frame.control_states.min())))
+                                 min_control_states=int(frame.control_states.min()),
+                                 min_treated_hospitals=int(frame.treated_hospitals.min()),
+                                 total_treated_states=int(frame.treated_states.max())))
     dynamic = pd.DataFrame(dynamic_rows).sort_values("event_time") if dynamic_rows else pd.DataFrame()
     meta = {
         "cohort_first_full_reporting_end_year": {s: g for s, g in cohorts.items()},
@@ -176,7 +180,8 @@ def estimate(d, periods, policy):
         "bootstrap_draws": N_BOOT,
         "bootstrap_seed": SEED,
         "minimum_not_yet_treated_control_states": MIN_CONTROL_STATES,
-        "estimand": "group-time ATT for SPA effective-date authorization, using within-hospital changes in OP-18c minus OP-18b",
+        "estimand": f"group-time ATT for SPA {date_column.replace('_', ' ')} authorization timing, using within-hospital changes in OP-18c minus OP-18b",
+        "treatment_date_column": date_column,
         "control_rule": "never-authorized or not-yet-authorized through the end of the comparison window",
         "transition_rule": "exclude report window containing the policy effective date",
         "inference": "percentile bootstrap resampling states with replacement",
@@ -185,7 +190,7 @@ def estimate(d, periods, policy):
     return gt, dynamic, meta
 
 
-def write_report(gt, dynamic, meta, policy):
+def write_report(gt, dynamic, meta, policy, approval_dynamic=None):
     cells = int(gt.att_minutes.notna().sum()) if not gt.empty else 0
     pre = gt.loc[gt.status.eq("pre-trend diagnostic") & gt.att_minutes.notna()] if not gt.empty else pd.DataFrame()
     if dynamic.empty:
@@ -198,15 +203,32 @@ def write_report(gt, dynamic, meta, policy):
                 f"(state-cluster bootstrap 95% interval {first.iloc[0].ci95_low:+.1f} to {first.iloc[0].ci95_high:+.1f}). "
                 "This is an exploratory estimate of Medicaid SPA authorization, not statewide operational availability.")
         rows = "\n".join(
-            f"| {int(r.event_time)} | {r.att_minutes:+.1f} | {r.ci95_low:+.1f} to {r.ci95_high:+.1f} | {int(r.cohort_time_cells)} | {int(r.min_treated_states)} |"
+            f"| {int(r.event_time)} | {r.period_type} | {r.att_minutes:+.1f} | {r.ci95_low:+.1f} to {r.ci95_high:+.1f} | {int(r.cohort_time_cells)} | {int(r.min_treated_states)} |"
             for r in dynamic.itertuples(index=False))
     pre_note = (f"{len(pre)} pre-policy cohort-time diagnostics are available. They assess departures from parallel trends but cannot prove the assumption."
                 if len(pre) else "There is insufficient pre-policy support to assess differential trends.")
+    early = gt.loc[gt.cohort.eq(2023) & gt.report_end_year.isin([2023, 2025]) & gt.att_minutes.notna()]
+    early_note = ""
+    if not early.empty:
+        early_note = " The earliest four-state cohort (AZ, NC, NY, OR) is negative in its supported post windows: " + "; ".join(
+            f"event time {int(r.event_time)} {r.att_minutes:+.1f} minutes (95% interval {r.ci95_low:+.1f} to {r.ci95_high:+.1f})"
+            for r in early.itertuples(index=False)) + ". These cohort-specific estimates are imprecise and should not be treated as a confirmed subgroup effect."
+    approval_note = ""
+    if approval_dynamic is not None and not approval_dynamic.empty:
+        ap0 = approval_dynamic.loc[approval_dynamic.event_time.eq(0)]
+        ap2 = approval_dynamic.loc[approval_dynamic.event_time.eq(2)]
+        parts = []
+        for label, frame in [("event time 0", ap0), ("event time 2", ap2)]:
+            if not frame.empty:
+                r = frame.iloc[0]
+                parts.append(f"{label}: {r.att_minutes:+.1f} minutes (95% interval {r.ci95_low:+.1f} to {r.ci95_high:+.1f}; minimum {int(r.min_treated_states)} treated states)")
+        if parts:
+            approval_note = "\n\nApproval-date timing sensitivity: " + "; ".join(parts) + ". Event-time 2 has very limited treated-state support, so its interval is not a stable policy-effect estimate. Full pre- and post-period estimates are in `mobile_crisis_event_study_approval_date.csv`."
     report = f"""# Medicaid mobile-crisis authorization and the psychiatric ED time gap
 
 ## Result
 
-{main}
+{main}{early_note}
 
 The outcome is the hospital-level OP-18c minus OP-18b gap in minutes, a difference between separately reported medians. OP-18 is for discharged ED visits, not admitted-patient boarding.
 
@@ -220,11 +242,12 @@ CMS SPA effective dates indicate authorization under the Medicaid plan. Most sta
 
 ## Dynamic group-time ATT
 
-| Event time (years; 0 = first full treated reporting window) | ATT (minutes) | State-cluster bootstrap 95% interval | Cohort-time cells | Minimum treated states |
-|---:|---:|---:|---:|---:|
+| Event time (years; 0 = first full treated reporting window) | Period | ATT (minutes) | State-cluster bootstrap 95% interval | Cohort-time cells | Minimum treated states |
+|---:|---|---:|---:|---:|---:|
 {rows}
 
-There are {cells} supported group-time cells. Full support appears in mobile_crisis_group_time_att.csv, mobile_crisis_event_study.csv, and mobile_crisis_did_metadata.json.
+Pre-period estimates are displayed as diagnostics and must be considered when assessing parallel trends. They are not proof that parallel trends holds. There are {cells} supported post-policy group-time cells. Full pre- and post-period support appears in mobile_crisis_group_time_att.csv and mobile_crisis_event_study.csv. An approval-date sensitivity analysis is reported in mobile_crisis_event_study_approval_date.csv; approval dates shift treatment timing later than effective dates in some states.
+{approval_note}
 
 ## Limits
 
@@ -242,9 +265,11 @@ def main():
     policy = load_policy()
     d = load_panel()
     periods = d[["start_date", "end_date", "end_year"]].drop_duplicates().sort_values("end_year")
-    gt, dynamic, meta = estimate(d, periods, policy)
+    gt, dynamic, meta = estimate(d, periods, policy, "effective_date")
+    _, approval_dynamic, approval_meta = estimate(d, periods, policy, "approval_date")
     gt.to_csv(RESULTS / "mobile_crisis_group_time_att.csv", index=False)
     dynamic.to_csv(RESULTS / "mobile_crisis_event_study.csv", index=False)
+    approval_dynamic.to_csv(RESULTS / "mobile_crisis_event_study_approval_date.csv", index=False)
     meta.update({
         "input_hospital_period_rows_after_threshold": int(len(d)),
         "input_hospitals": int(d.facility_id.nunique()),
@@ -252,7 +277,8 @@ def main():
         "last_outcome_period_end": str(d.end_date.max().date()),
     })
     (RESULTS / "mobile_crisis_did_metadata.json").write_text(json.dumps(meta, indent=2), encoding="utf-8")
-    write_report(gt, dynamic, meta, policy)
+    (RESULTS / "mobile_crisis_approval_date_metadata.json").write_text(json.dumps(approval_meta, indent=2), encoding="utf-8")
+    write_report(gt, dynamic, meta, policy, approval_dynamic)
     print(json.dumps(meta, indent=2))
     if not dynamic.empty:
         print(dynamic.to_string(index=False))
@@ -260,4 +286,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

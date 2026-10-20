@@ -1,13 +1,15 @@
-# Pre-analysis plan
+# Analysis plan and decision log
 
-**Version:** 0.1 scaffold, 2026-10-20  
-**Status:** decisions recorded before estimation; update by dated amendment only.
+**Version:** 0.2, updated 2026-10-20  
+**Status:** versioned analysis decisions and amendments. This is a decision log, not a pre-registration.
 
 ## Dated amendment — 2026-10-20, after first driver-model fit
 
-CMS Hospital General Information and USDA 2023 Rural-Urban Continuum Codes are used for an exploratory latest-period cross-section only, not projected backward to historical releases. The model outcome is the OP-18c minus OP-18b difference in separately reported hospital medians. It includes hospital type, ownership, emergency-service status, metro/nonmetro classification, state fixed effects, and state-clustered CR1 standard errors. Report normal-approximation intervals and p-values as approximate. Peer groups are hospital type × metro/nonmetro; publish group distributions only for cells with at least 20 hospitals. This post-estimation amendment documents the implemented model and does not represent a pre-registered driver specification. We do not call associations causal or report hospital ranks. Bed count, safety-net status, psychiatric-bed supply, and mental-health workforce/HPSA are omitted because valid linked measures were not assembled.
+CMS Hospital General Information and USDA 2023 Rural-Urban Continuum Codes are used for an exploratory latest-period cross-section only, not projected backward to historical releases. The model outcome is the OP-18c minus OP-18b difference in separately reported hospital medians. It includes hospital type, ownership, emergency-service status, metro/nonmetro classification, state fixed effects, and state-clustered CR1 standard errors. Report normal-approximation intervals and p-values as approximate. Peer groups are hospital type × metro/nonmetro; publish group distributions only for cells with at least 20 hospitals. This amendment documents an exploratory model specification developed after the initial analysis. We do not call associations causal or report hospital ranks. Bed count, safety-net status, psychiatric-bed supply, and mental-health workforce/HPSA are omitted because valid, time-aligned linked measures have not yet been assembled.
 
 The mobile-crisis model was estimated after treatment-date audit, as an explicitly exploratory amendment. CMS SPA effective dates are used as authorization timing because statewide operational dates were not verified for most states; the estimand is therefore intention-to-implement, not actual service availability. The model uses non-overlapping annual OP-18 windows ending 2018 and 2020–2025, excludes transition windows, requires at least 11 sampled patients for each measure, and compares within-hospital gap changes against never/not-yet-authorized controls. Cohort-time ATT estimates are aggregated by event time, with state-cluster percentile bootstrap intervals. Event time zero pools three cohort-time cells, including a four-state early cohort; only three post-policy event times are supported and later cohorts have short follow-up. Pre-policy diagnostics are not proof of parallel trends. Results must be described as exploratory and not as evidence of no effect when intervals include zero.
+
+The latest-period driver model was subsequently expanded using CMS Provider of Services Q2 2026 fields for certified beds and psychiatric-unit beds and HRSA's current mental-health HPSA file for county geographic designation. Bed counts enter as log(1 + count); HPSA is aggregated to county FIPS and coded as any currently designated geographic/high-needs geographic mental-health HPSA. POS matched both bed measures to all 3,023 model hospitals; the county HPSA indicator matched 75.6%. These are cross-sectional additions with imperfect time alignment to the September 2025 outcome. HPSA is not a hospital workforce measure, and psychiatric-unit beds are not a measure of all nearby capacity. Coefficients remain exploratory and noncausal.
 
 ## Dated amendment — 2026-10-20
 
@@ -20,13 +22,13 @@ The observational unit will be hospital (CCN) × reporting period. Primary outco
 ## Layer 1: descriptive benchmark
 
 - Preserve CMS-reported periods, measure IDs, footnotes, suppression codes, source release identifiers, and archive snapshot dates. CMS describes the public `Sample` field for eligible patients and sampling rules; treat it as a measure-specific case count, not total ED volume. Preserve the field, but validate a confidence-interval procedure for the median before using it for uncertainty estimates.
-- Compare raw hospital gaps to an empirical-Bayes/shrinkage estimate with interval. If CMS does not provide denominators or standard errors, do not invent precision from the median; estimate reliability only where defensible auxiliary counts/variance inputs are available. Otherwise show stratified raw distributions, suppress unstable ranks, and label the shrinkage model's assumptions.
-- Show sample-size sensitivity only when a valid denominator is available. Provide raw ordering next to uncertainty-aware estimates and rank movement.
+- Compare raw hospital gaps with an exploratory empirical-Bayes shrinkage estimate. The current variance relationship is estimated from repeated annual hospital windows by sample size; held-out-year validation measures prediction only. Annual residual variation also contains real hospital change, so it is not a validated patient-level sampling variance or confidence interval for a difference of medians. Do not publish inferential intervals or hospital ranks from this model.
+- Show sample-size sensitivity and clearly state that changing thresholds selects different hospitals. Do not imply that thresholds or shrinkage remove selection bias.
 - No “best/worst hospital” claim; rankings are descriptive and not causal or risk-adjusted quality ratings.
 
 ## Layer 2: associations and peers
 
-Candidate predictors: ownership, hospital type/size, emergency services, rurality, safety-net proxy, nearby psychiatric bed supply, county mental-health HPSA/workforce, state Medicaid expansion, and period. Use hospital and state structure appropriate to the final panel; report adjusted associations, uncertainty, missingness, and collinearity. Define peer groups using pre-specified observable characteristics and minimum cell sizes, not outcome values.
+Candidate predictors include ownership, hospital type/size, emergency services, rurality, safety-net proxy, nearby psychiatric bed supply, county mental-health HPSA/workforce, state Medicaid expansion, and period. The current one-period model includes ownership, hospital type, emergency services, metro status, CMS certified beds and psychiatric-unit beds, county mental-health HPSA designation, and state fixed effects. Hospital-level bed measures and HPSA match coverage and temporal limits must be reported. Use hospital and state structure appropriate to the final panel; report adjusted associations, uncertainty, missingness, and collinearity. Define peer groups using pre-specified observable characteristics and minimum cell sizes, not outcome values.
 
 ## Layer 3: policy evaluation
 
@@ -42,4 +44,3 @@ Pre-specified: alternative confirmed policy dates; exclude transition period; ba
 2. Confirm raw CMS schema and stable CCN before joining covariates.
 3. Confirm policy implementation dates from primary sources before treatment coding.
 4. Confirm outcome availability, number of adopting states, and pre-period support before causal estimation. If support is inadequate, report descriptive policy timing instead of a causal effect.
-

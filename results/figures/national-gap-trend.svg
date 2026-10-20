@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 320" role="img" aria-labelledby="title desc">
+  <title id="title">Median hospital psychiatric emergency department time gap</title>
+  <desc id="desc">Selected annual reporting windows: 76 minutes in 2018, 79 in 2019, 96 in 2020, 82 in 2021, 90 in 2022, 87 in 2023, and 83 in 2024 and 2025.</desc>
+  <rect width="920" height="320" rx="16" fill="#f4f7f8"/>
+  <text x="56" y="42" fill="#172a3a" font-family="Arial,sans-serif" font-size="20" font-weight="700">Psychiatric ED time gap</text>
+  <text x="56" y="66" fill="#526879" font-family="Arial,sans-serif" font-size="13">Median hospital-level difference · minutes · selected 12-month CMS reporting windows</text>
+  <g stroke="#d8e2e8" stroke-width="1" font-family="Arial,sans-serif" font-size="12" fill="#526879">
+    <line x1="76" y1="250" x2="874" y2="250"/><text x="54" y="254">0</text>
+    <line x1="76" y1="190" x2="874" y2="190"/><text x="46" y="194">30</text>
+    <line x1="76" y1="130" x2="874" y2="130"/><text x="46" y="134">60</text>
+    <line x1="76" y1="70" x2="874" y2="70"/><text x="46" y="74">90</text>
+  </g>
+  <polyline points="96,98 204,92 312,58 420,86 528,70 636,76 744,84 852,84" fill="none" stroke="#147d82" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <g fill="#147d82" stroke="#ffffff" stroke-width="3">
+    <circle cx="96" cy="98" r="7"/><circle cx="204" cy="92" r="7"/><circle cx="312" cy="58" r="7"/><circle cx="420" cy="86" r="7"/>
+    <circle cx="528" cy="70" r="7"/><circle cx="636" cy="76" r="7"/><circle cx="744" cy="84" r="7"/><circle cx="852" cy="84" r="7"/>
+  </g>
+  <g fill="#526879" font-family="Arial,sans-serif" font-size="12" text-anchor="middle">
+    <text x="96" y="274">2018 · 76</text><text x="204" y="274">2019 · 79</text><text x="312" y="274">2020 · 96</text><text x="420" y="274">2021 · 82</text>
+    <text x="528" y="274">2022 · 90</text><text x="636" y="274">2023 · 87</text><text x="744" y="274">2024 · 83</text><text x="852" y="274">2025 · 83</text>
+  </g>
+  <text x="56" y="302" fill="#526879" font-family="Arial,sans-serif" font-size="11">Descriptive comparison. Windows differ in hospital coverage; the gap is not an individual patient's extra waiting time or admitted-patient boarding.</text>
+</svg>
