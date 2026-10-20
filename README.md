@@ -8,6 +8,8 @@ An open, reproducible analysis of U.S. hospital emergency department time for ps
 
 Read the integrated [executive brief](results/executive_brief.md) for a concise summary of findings and interpretation.
 
+The [interactive hospital lookup](site/hospital_lookup.html) supports searches by hospital name, CMS ID, state, and peer group. Regenerate it with `python python/build_hospital_lookup.py` after rebuilding the peer comparison file.
+
 ## Questions
 
 1. **Benchmark:** What is each hospital's OP-18c minus OP-18b median-time gap, and how much do raw rankings change after uncertainty-aware shrinkage? The raw hospital-period gaps are built. Shrinkage and rankings await a validated uncertainty method for the difference of medians; none are published yet.
@@ -26,6 +28,7 @@ python python/download_and_build_panel.py
 python python/build_historical_panel.py
 python python/build_hospital_drivers.py
 python python/build_mobile_crisis_did.py
+python python/build_hospital_lookup.py
 ```
 
 The current-release script uses CMS metadata to resolve the hospital CSV download. The archive script downloads CMS annual hospital archives (about 500 MB in total for 2019–2026), reads quarterly snapshots, adapts the early CMS column-name changes, retains OP-18a/b/c/d scores and footnotes, and builds the longitudinal hospital panel. The driver script downloads current CMS Hospital General Information and USDA 2023 Rural-Urban Continuum Codes and creates the latest-period model and peer summaries. Raw CMS downloads and hospital-level panels are ignored by Git; aggregate result files are committed. `R/` and `_targets.R` are an optional scaffold and have not been executed in this environment.
