@@ -10,3 +10,4 @@ renv::snapshot()
 ```
 
 Commit the resulting lockfile. Later contributors should run `renv::restore()` before building targets.
+
