@@ -13,6 +13,18 @@
   ],
   "variance_source": "within-hospital deviations after additive year effects in repeated annual, non-overlapping windows",
   "interpretation_limit": "annual residual variation includes real hospital changes and measurement noise; it is not a validated sampling variance or confidence interval for a median difference",
+  "rank_churn": {
+    "matched_hospitals": 2933,
+    "decile_size": 294,
+    "prior_years_minimum": 1,
+    "prior_year_mean_years_median": 5.0,
+    "top_decile_overlap_n": 123,
+    "top_decile_overlap_share": 0.41836734693877553,
+    "bottom_decile_overlap_n": 84,
+    "bottom_decile_overlap_share": 0.2857142857142857,
+    "definition": "Top/bottom decile of 2025 gap versus top/bottom decile of each matched hospital's mean across all available selected annual windows before 2025; at least one prior year; ceil(10% of matched hospitals), ties broken by facility ID.",
+    "interpretation_limit": "Annual rank churn mixes true hospital change with measurement noise and is not a hospital quality rating."
+  },
   "noise_variance_intercept": 1140.9594264017392,
   "noise_variance_reciprocal_sample_slope": 36788.97195918275,
   "between_hospital_variance": 13337.310098639802,

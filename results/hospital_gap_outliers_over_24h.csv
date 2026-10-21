@@ -1,0 +1,3 @@
+facility_id,facility_name_op18,state,psych_gap_minutes,sample_min_op18bc,start_date,end_date,flag_rule,action
+670090,CRESCENT MEDICAL CENTER LANCASTER,TX,6710.0,33.0,2024-10-01,2025-09-30,"psych_gap_minutes > 1,440 (24 hours)",Retained in primary OLS; checked in 99th-percentile winsorized sensitivity; investigate source reporting
+450644,HCA HOUSTON HEALTHCARE WEST,TX,2904.0,14.0,2024-10-01,2025-09-30,"psych_gap_minutes > 1,440 (24 hours)",Retained in primary OLS; checked in 99th-percentile winsorized sensitivity; investigate source reporting

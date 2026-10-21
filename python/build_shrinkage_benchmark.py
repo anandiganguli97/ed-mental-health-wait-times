@@ -113,9 +113,36 @@ def holdout_validation(d: pd.DataFrame, test_year: int) -> dict:
             "noise_bins": bins}
 
 
+def rank_churn(d: pd.DataFrame) -> dict:
+    latest = d.loc[d.year.eq(2025), ["facility_id", "gap"]].rename(columns={"gap": "gap_2025"})
+    prior = d.loc[d.year.lt(2025)].groupby("facility_id").agg(
+        prior_year_mean_gap=("gap", "mean"), prior_years=("year", "nunique")).reset_index()
+    matched = latest.merge(prior, on="facility_id", how="inner", validate="one_to_one")
+    # One prior annual window is sufficient for inclusion; the mean uses all available
+    # earlier selected annual windows. Ties are broken reproducibly by CMS facility ID.
+    matched = matched.sort_values(["gap_2025", "facility_id"]).reset_index(drop=True)
+    n = len(matched); k = int(np.ceil(.10 * n))
+    top_2025 = set(matched.tail(k).facility_id)
+    bottom_2025 = set(matched.head(k).facility_id)
+    by_prior = matched.sort_values(["prior_year_mean_gap", "facility_id"])
+    top_prior = set(by_prior.tail(k).facility_id)
+    bottom_prior = set(by_prior.head(k).facility_id)
+    summary = {"matched_hospitals": n, "decile_size": k,
+        "prior_years_minimum": 1, "prior_year_mean_years_median": float(matched.prior_years.median()),
+        "top_decile_overlap_n": len(top_2025 & top_prior),
+        "top_decile_overlap_share": len(top_2025 & top_prior) / k,
+        "bottom_decile_overlap_n": len(bottom_2025 & bottom_prior),
+        "bottom_decile_overlap_share": len(bottom_2025 & bottom_prior) / k,
+        "definition": "Top/bottom decile of 2025 gap versus top/bottom decile of each matched hospital's mean across all available selected annual windows before 2025; at least one prior year; ceil(10% of matched hospitals), ties broken by facility ID.",
+        "interpretation_limit": "Annual rank churn mixes true hospital change with measurement noise and is not a hospital quality rating."}
+    (RESULTS / "hospital_rank_churn_summary.json").write_text(json.dumps(summary, indent=2), encoding="utf-8")
+    return summary
+
+
 def main() -> None:
     RESULTS.mkdir(parents=True, exist_ok=True)
     d = load_panel()
+    churn = rank_churn(d)
     validations = [holdout_validation(d, year) for year in (2024, 2025)]
     a, b, bins = fit_noise_model(d.loc[d.year.lt(2025)].copy())
     effects, tau2 = estimate_effects(d.loc[d.year.lt(2025)].copy(), a, b)
@@ -130,13 +157,15 @@ def main() -> None:
             "sample_threshold": MIN_SAMPLE, "years": YEARS,
             "variance_source": "within-hospital deviations after additive year effects in repeated annual, non-overlapping windows",
             "interpretation_limit": "annual residual variation includes real hospital changes and measurement noise; it is not a validated sampling variance or confidence interval for a median difference",
+            "rank_churn": churn,
             "noise_variance_intercept": a, "noise_variance_reciprocal_sample_slope": b,
             "between_hospital_variance": tau2, "noise_bins": bins,
             "validation": validations,
             "validation_rule": "predict each held-out year's hospital deviation from prior years and compare RMSE with the unshrunk prior-year mean; this validates prediction only, not patient-level uncertainty"}
     (RESULTS / "hospital_gap_shrinkage_metadata.json").write_text(json.dumps(meta, indent=2), encoding="utf-8")
     print(json.dumps({"rows": len(d), "latest_hospitals": len(latest), "validation": validations,
-                      "noise_variance_intercept": a, "noise_variance_reciprocal_sample_slope": b,
+                      "rank_churn": churn,
+            "noise_variance_intercept": a, "noise_variance_reciprocal_sample_slope": b,
                       "between_hospital_variance": tau2}, indent=2))
 
 

@@ -160,9 +160,15 @@ def make_design(data: pd.DataFrame, include_contextual_covariates: bool = True) 
             x[col] = (values == level).astype(float)
             exposure_columns.append(col)
     if include_contextual_covariates:
-        for variable, source in [("log_bed_count", "BED_CNT"), ("log_psych_unit_beds", "PSYCH_UNIT_BED_CNT")]:
-            x[variable] = np.log1p(pd.to_numeric(data[source], errors="coerce").fillna(0).clip(lower=0))
-            exposure_columns.append(variable)
+        variable, source = "log_bed_count", "BED_CNT"
+        x[variable] = np.log1p(pd.to_numeric(data[source], errors="coerce").fillna(0).clip(lower=0))
+        exposure_columns.append(variable)
+        psych_beds = pd.to_numeric(data["PSYCH_UNIT_BED_CNT"], errors="coerce")
+        psych_status = np.where(psych_beds.isna(), "Unknown", np.where(psych_beds.gt(0), "Yes", "No"))
+        for level in [level for level in sorted(set(psych_status)) if level != "No"]:
+            col = f"has_psych_unit[{level}]"
+            x[col] = (psych_status == level).astype(float)
+            exposure_columns.append(col)
     # State fixed effects absorb broad state policy and market differences.
     states = data["state"].fillna("Unknown").astype(str)
     for state in sorted(states.unique())[1:]:
@@ -170,9 +176,11 @@ def make_design(data: pd.DataFrame, include_contextual_covariates: bool = True) 
     return x.to_numpy(dtype=float), list(x.columns), exposure_columns
 
 
-def fit_clustered_ols(data: pd.DataFrame, include_contextual_covariates: bool = True) -> tuple[pd.DataFrame, dict]:
+def fit_clustered_ols(data: pd.DataFrame, include_contextual_covariates: bool = True, winsorize_upper: float | None = None) -> tuple[pd.DataFrame, dict]:
     x, names, exposures = make_design(data, include_contextual_covariates)
-    y = pd.to_numeric(data["psych_gap_minutes"], errors="coerce").to_numpy(dtype=float)
+    y_raw = pd.to_numeric(data["psych_gap_minutes"], errors="coerce").to_numpy(dtype=float)
+    cap = float(np.quantile(y_raw, winsorize_upper)) if winsorize_upper is not None else None
+    y = np.minimum(y_raw, cap) if cap is not None else y_raw.copy()
     states = data["state"].fillna("Unknown").astype(str).to_numpy()
     n, k = x.shape
     rank = int(np.linalg.matrix_rank(x))
@@ -204,7 +212,9 @@ def fit_clustered_ols(data: pd.DataFrame, include_contextual_covariates: bool = 
     meta = {"n_hospitals": int(n), "state_clusters": int(len(groups)), "design_columns": int(k),
             "r_squared_including_state_fixed_effects": r2, "residual_sd_minutes": float(np.sqrt(np.sum(resid**2)/(n-k))),
             "sample_threshold_both_components": MIN_SAMPLE, "period_end": str(pd.to_datetime(data["end_date"]).max().date()),
-            "covariance": "CR1 state-clustered sandwich; normal-approximation 95% intervals and p-values"}
+            "covariance": "CR1 state-clustered sandwich; normal-approximation 95% intervals and p-values",
+            "outcome_winsorized_upper_quantile": winsorize_upper, "outcome_upper_cap_minutes": cap,
+            "outcome_outliers_over_24h_retained": int(np.sum(y_raw > 1440))}
     return out, meta
 
 
@@ -229,14 +239,26 @@ def build_peers(data: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
 def main() -> None:
     RESULTS.mkdir(parents=True, exist_ok=True)
     PROCESSED.mkdir(parents=True, exist_ok=True)
-    cms_path, rucc_path, pos_path, hpsa_path, meta = download_sources()
+    cached = [RAW / "Hospital_General_Information-current.csv", RAW / "USDA_RUCC_2023.csv", RAW / "cms_pos_q2_2026.csv", RAW / "hrsa_hpsa_mh_current.csv"]
+    if all(path.exists() for path in cached):
+        cms_path, rucc_path, pos_path, hpsa_path = cached
+        meta = json.loads((RAW / "hospital_drivers_sources.json").read_text(encoding="utf-8"))
+    else:
+        cms_path, rucc_path, pos_path, hpsa_path, meta = download_sources()
     chars = load_hospital_characteristics(cms_path, rucc_path, pos_path, hpsa_path)
     data = build_driver_panel(chars)
     base_coeffs, base_meta = fit_clustered_ols(data, include_contextual_covariates=False)
     coeffs, model_meta = fit_clustered_ols(data, include_contextual_covariates=True)
+    robust_coeffs, robust_meta = fit_clustered_ols(data, include_contextual_covariates=True, winsorize_upper=0.99)
     peer_summary, peer_rows = build_peers(data)
     chars.to_csv(PROCESSED / "hospital_characteristics_current.csv", index=False)
     coeffs.to_csv(RESULTS / "hospital_driver_model_coefficients.csv", index=False)
+    robust_coeffs.to_csv(RESULTS / "hospital_driver_model_winsorized_coefficients.csv", index=False)
+    outliers = data.loc[pd.to_numeric(data["psych_gap_minutes"], errors="coerce").gt(1440),
+                        ["facility_id", "facility_name_op18", "state", "psych_gap_minutes", "sample_min_op18bc", "start_date", "end_date"]].copy()
+    outliers["flag_rule"] = "psych_gap_minutes > 1,440 (24 hours)"
+    outliers["action"] = "Retained in primary OLS; checked in 99th-percentile winsorized sensitivity; investigate source reporting"
+    outliers.to_csv(RESULTS / "hospital_gap_outliers_over_24h.csv", index=False)
     base_coeffs.to_csv(RESULTS / "hospital_driver_model_base_coefficients.csv", index=False)
     peer_summary.to_csv(RESULTS / "peer_group_summary.csv", index=False)
     peer_rows[["facility_id", "facility_name_op18", "state", "hospital_type", "hospital_ownership", "rurality",
@@ -244,6 +266,8 @@ def main() -> None:
                "median_gap_minutes", "gap_vs_peer_median_minutes", "peer_percentile"]].to_csv(
                    RESULTS / "hospital_peer_comparison.csv", index=False)
     model_meta.update(meta)
+    model_meta["winsorized_sensitivity"] = robust_meta
+    model_meta["outlier_rule"] = "Flag any positive OP-18c minus OP-18b gap above 1,440 minutes; retain in primary model and cap only in a labeled 99th-percentile sensitivity."
     model_meta["base_model_r_squared_including_state_fixed_effects"] = base_meta["r_squared_including_state_fixed_effects"]
     model_meta.update({"joined_characteristics": int(data["hospital_type"].ne("Unknown").sum()),
                        "county_rucc_match_share": float(data["rucc_2023"].notna().mean()),
@@ -263,15 +287,19 @@ def main() -> None:
 
 This is a cross-sectional analysis of the latest common OP-18 period ending {model_meta['period_end']}. The analysis includes {model_meta['n_hospitals']:,} hospitals with reportable OP-18b and OP-18c scores and at least {MIN_SAMPLE} sampled patients in both components. Current CMS Hospital General Information and USDA 2023 RUCC are joined to that latest period only; they are not assigned retrospectively to earlier observations.
 
-The outcome is OP-18c minus OP-18b, in minutes. It is the difference between two separately reported medians, not the median of patient-level paired differences. Predictors are hospital type, ownership, emergency-service status, metro/nonmetro classification, certified bed count, psychiatric-unit beds, and county mental-health geographic HPSA designation. Bed counts come from the CMS Provider of Services Q2 2026 file; HRSA HPSA designations are current at download and county-linked. The model includes state fixed effects and state-clustered CR1 standard errors. Bed counts enter as log(1 + count). Confidence intervals and p-values use a normal approximation. Coefficients are conditional associations, not causal effects or rankings.
+The outcome is OP-18c minus OP-18b, in minutes. It is the difference between two separately reported medians, not the median of patient-level paired differences. Predictors are hospital type, ownership, emergency-service status, metro/nonmetro classification, log(1 + certified beds), a binary indicator for any psychiatric-unit bed, and county mental-health geographic HPSA designation. Bed counts come from the CMS Provider of Services Q2 2026 file; HRSA HPSA designations are current at download and county-linked. The model includes state fixed effects and state-clustered CR1 standard errors. Certified beds enter as log(1 + count); psychiatric-unit beds enter as a yes/no indicator (any reported bed versus none). Confidence intervals and p-values use a normal approximation. Coefficients are conditional associations, not causal effects or rankings.
 
 ## Main finding and expanded-model sensitivity
 
-In the baseline specification, Critical Access Hospitals had an adjusted gap **{abs(cab_base.estimate_minutes):.1f} minutes lower** than acute care hospitals (95% CI {abs(cab_base.ci95_high):.1f} to {abs(cab_base.ci95_low):.1f} minutes lower), conditional on ownership, emergency-service status, metro status, and state fixed effects. It was the only baseline estimate with an interval excluding zero. After adding certified bed count, psychiatric-unit beds, and county mental-health HPSA, the CAH estimate attenuated to {cab.estimate_minutes:+.1f} minutes (95% CI {cab.ci95_low:+.1f} to {cab.ci95_high:+.1f}); this interval includes zero. The expanded model explains {100*model_meta['r_squared_including_state_fixed_effects']:.1f}% of observed gap variation, compared with {100*base_meta['r_squared_including_state_fixed_effects']:.1f}% in the baseline. Most variation remains unexplained.
+Values above 1,440 minutes are flagged for review. The primary OLS retains all observations; a separate sensitivity caps the outcome at its 99th percentile ({robust_meta["outcome_upper_cap_minutes"]:.1f} minutes). The flagged hospitals and reproducible sensitivity coefficients are listed in `hospital_gap_outliers_over_24h.csv` and `hospital_driver_model_winsorized_coefficients.csv`.
+
+In the baseline specification, Critical Access Hospitals had an adjusted gap **{abs(cab_base.estimate_minutes):.1f} minutes lower** than acute care hospitals (95% CI {abs(cab_base.ci95_high):.1f} to {abs(cab_base.ci95_low):.1f} minutes lower), conditional on ownership, emergency-service status, metro status, and state fixed effects. It was the only baseline estimate with an interval excluding zero. After adding bed count, psychiatric-unit presence, and county mental-health HPSA, the CAH estimate attenuated to {cab.estimate_minutes:+.1f} minutes (95% CI {cab.ci95_low:+.1f} to {cab.ci95_high:+.1f}). CAHs are limited to 25 inpatient/swing beds by CMS rules, so the category and bed-count terms overlap structurally; the attenuation is consistent with bed-size adjustment absorbing part of the CAH contrast, rather than evidence that the association is unstable. [CMS describes the 25-bed limit](https://www.cms.gov/medicare/health-safety-standards/certification-compliance/critical-access-hospitals). The expanded model explains {100*model_meta['r_squared_including_state_fixed_effects']:.1f}% of observed gap variation, compared with {100*base_meta['r_squared_including_state_fixed_effects']:.1f}% in the baseline. Most variation remains unexplained.
+
+A one-unit increase in log(1 + certified beds) is associated with {coeffs.loc[coeffs.term.eq("log_bed_count"), "estimate_minutes"].iloc[0]:+.1f} minutes (95% CI {coeffs.loc[coeffs.term.eq("log_bed_count"), "ci95_low"].iloc[0]:+.1f} to {coeffs.loc[coeffs.term.eq("log_bed_count"), "ci95_high"].iloc[0]:+.1f}). Hospitals reporting any psychiatric-unit bed have an estimated {coeffs.loc[coeffs.term.eq("has_psych_unit[Yes]"), "estimate_minutes"].iloc[0]:+.1f}-minute difference versus none (95% CI {coeffs.loc[coeffs.term.eq("has_psych_unit[Yes]"), "ci95_low"].iloc[0]:+.1f} to {coeffs.loc[coeffs.term.eq("has_psych_unit[Yes]"), "ci95_high"].iloc[0]:+.1f}). Both estimates are imprecise.
 
 Ownership contrasts use **Voluntary non-profit - Private** as the reference. Federal-government, physician-owned, and tribal hospitals are combined into one small “Other” category. Remaining coefficients are exploratory associations, not causal effects.
 
-The expanded-model coefficients are in `hospital_driver_model_coefficients.csv`; the baseline specification is in `hospital_driver_model_base_coefficients.csv`. Model metadata: `hospital_driver_model_metadata.json`.
+The expanded-model coefficients are in `hospital_driver_model_coefficients.csv`; the robust sensitivity is in `hospital_driver_model_winsorized_coefficients.csv`; the baseline specification is in `hospital_driver_model_base_coefficients.csv`. Model metadata: `hospital_driver_model_metadata.json`.
 
 ## Peer groups
 
@@ -279,7 +307,7 @@ Peer groups are defined before looking at outcomes as CMS hospital type × USDA 
 
 ## Limitations
 
-The CMS Hospital General Information characteristics are current (retrieved {model_meta['cms_characteristics_as_of']}); the POS file describes 2026 Q2; HRSA HPSA designations are current at retrieval; and RUCC is a 2023 county classification. Covariate timing therefore does not exactly match the September 2025 outcome, and hospital conditions may have changed. Psychiatric-unit beds are CMS unit-bed counts, not a census of inpatient psychiatric capacity at nearby facilities. HPSA is a county-level geographic designation, not a hospital-specific workforce measure; a valid county FIPS with no currently designated geographic or high-needs geographic record is coded “No,” and the full indicator coverage is {model_meta['county_mh_hpsa_match_share']:.1%}. There is no causal identification, no adjustment for patient acuity, and no validated uncertainty model for the median gap. Refresh files and audit coverage before reuse.
+The CMS Hospital General Information characteristics are current (retrieved {model_meta['cms_characteristics_as_of']}); the POS file describes 2026 Q2; HRSA HPSA designations are current at retrieval; and RUCC is a 2023 county classification. Covariate timing therefore does not exactly match the September 2025 outcome, and hospital conditions may have changed. Psychiatric-unit presence is based on CMS POS reported unit-bed counts, not a census of inpatient psychiatric capacity at nearby facilities. HPSA is a county-level geographic designation, not a hospital-specific workforce measure; a valid county FIPS with no currently designated geographic or high-needs geographic record is coded “No,” and the full indicator coverage is {model_meta['county_mh_hpsa_match_share']:.1%}. There is no causal identification, no adjustment for patient acuity, and no validated uncertainty model for the median gap. Refresh files and audit coverage before reuse.
 
 Sources: [CMS Hospital General Information](https://data.cms.gov/provider-data/dataset/xubh-q36u), [CMS Provider of Services](https://data.cms.gov/provider-characteristics/hospitals-and-other-facilities/provider-of-services-file-quality-improvement-and-evaluation-system), [HRSA mental-health HPSA downloads](https://data.hrsa.gov/data/download?AHRF=&data=AHRF), and [USDA 2023 Rural-Urban Continuum Codes](https://www.ers.usda.gov/data-products/rural-urban-continuum-codes/).
 """
