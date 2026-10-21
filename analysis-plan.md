@@ -1,7 +1,13 @@
 # Analysis plan and decision log
 
-**Version:** 0.2, updated 2026-10-20  
+**Version:** 0.3, updated 2026-10-21  
 **Status:** versioned analysis decisions and amendments. This is a decision log, not a pre-registration.
+
+## Dated amendment — 2026-10-21, annual outlier and rank-stability audit
+
+The 24-hour rule applies to each selected annual reporting window (2018 and 2020–2025), keeping the latest CMS snapshot for each hospital-window. It flags 21 hospital-period observations across 12 CCNs; each has at least 11 cases in both OP-18 components. The primary analyses retain observations. The driver model reports a separate p99 upper-winsorized sensitivity, which caps 31 of 3,023 latest-period outcomes at 602.34 minutes. A targeted sensitivity drops all six HCA Houston CCNs from the Texas never-treated control in the mobile-crisis analysis. The HCA name audit records aliases at CCNs 450097 (Bayshore Medical Center / HCA Houston Healthcare Southeast) and 450775 (Kingwood Medical Center / HCA Houston Healthcare Kingwood); the broader dated CCN crosswalk remains open.
+
+Rank overlap is reported for the psychiatric gap and OP-18b using the same complete matched hospitals and 11-case threshold. Comparisons are 2025 against each hospital’s mean over available earlier selected annual windows and 2024 against 2025. These are descriptive decile overlaps, not facility ratings. Sample-size residual scales are broadly flat through 49 cases and lower above 50. The decile churn mixes measurement noise and true annual change.
 
 ## Dated amendment — 2026-10-20, after first driver-model fit
 
@@ -9,11 +15,11 @@ CMS Hospital General Information and USDA 2023 Rural-Urban Continuum Codes are u
 
 The mobile-crisis model was estimated after treatment-date audit, as an explicitly exploratory amendment. CMS SPA effective dates are used as authorization timing because statewide operational dates were not verified for most states; the estimand is therefore intention-to-implement, not actual service availability. The model uses non-overlapping annual OP-18 windows ending 2018 and 2020–2025, excludes transition windows, requires at least 11 sampled patients for each measure, and compares within-hospital gap changes against never/not-yet-authorized controls. Cohort-time ATT estimates are aggregated by event time, with state-cluster percentile bootstrap intervals. Event time zero pools three cohort-time cells, including a four-state early cohort; only three post-policy event times are supported and later cohorts have short follow-up. Pre-policy diagnostics are not proof of parallel trends. Results must be described as exploratory and not as evidence of no effect when intervals include zero.
 
-The latest-period driver model was subsequently expanded using CMS Provider of Services Q2 2026 fields for certified beds and psychiatric-unit beds and HRSA's current mental-health HPSA file for county geographic designation. Bed counts enter as log(1 + count); HPSA is aggregated to county FIPS and coded Yes for a currently designated geographic/high-needs geographic mental-health HPSA, No when a valid county FIPS has no such record, and Unknown for a missing/invalid county FIPS. POS matched both bed measures to all 3,023 model hospitals; the county indicator had valid FIPS for all 3,023. These are cross-sectional additions with imperfect time alignment to the September 2025 outcome. HPSA is not a hospital workforce measure, and psychiatric-unit beds are not a measure of all nearby capacity. Coefficients remain exploratory and noncausal.
+The latest-period driver model was subsequently expanded using CMS Provider of Services Q2 2026 fields for certified beds and a binary any-psychiatric-unit indicator and HRSA's current mental-health HPSA file for county geographic designation. Bed counts enter as log(1 + count); HPSA is aggregated to county FIPS and coded Yes for a currently designated geographic/high-needs geographic mental-health HPSA, No when a valid county FIPS has no such record, and Unknown for a missing/invalid county FIPS. POS matched both bed measures to all 3,023 model hospitals; the county indicator had valid FIPS for all 3,023. These are cross-sectional additions with imperfect time alignment to the September 2025 outcome. HPSA is not a hospital workforce measure, and psychiatric-unit beds are not a measure of all nearby capacity. Coefficients remain exploratory and noncausal.
 
 ## Dated amendment — 2026-10-20
 
-CMS hospital archive snapshots have now been assembled from March 2019 through August 2026. They cover reporting periods beginning in 2017 and provide repeated snapshots with rolling and annual reporting windows. The release date is retained and the measure's own start/end dates separately. For descriptive year-to-year summaries, select comparable 12-month periods and label calendar-year windows; overlapping windows are not independent outcomes. The reported sample field is retained as a measure-specific sampled-patient count, not total ED volume. Threshold sensitivity at 11, 20, 30, 50, and 100 patients is reported descriptively; no threshold is treated as an uncertainty correction. Sample counts without patient-level spread do not recover the sampling distribution of a median difference. The one-period limitation is removed for trend description; causal policy and driver models remain gated on comparability, treatment dates, and covariate availability.
+CMS hospital archive snapshots have now been assembled from March 2019 through August 2026. They cover reporting periods beginning in 2017 and provide repeated snapshots with rolling and annual reporting windows. The release date and the measure's own start/end dates are retained separately. For descriptive year-to-year summaries, select comparable 12-month periods and label calendar-year windows; overlapping windows are not independent outcomes. The reported sample field is retained as a measure-specific sampled-patient count, not total ED volume. Threshold sensitivity at 11, 20, 30, 50, and 100 patients is reported descriptively; no threshold is treated as an uncertainty correction. Sample counts without patient-level spread do not recover the sampling distribution of a median difference. The one-period limitation is removed for trend description; causal policy and driver models remain gated on comparability, treatment dates, and covariate availability.
 
 ## Population and outcome
 
@@ -28,7 +34,7 @@ The observational unit will be hospital (CCN) × reporting period. Primary outco
 
 ## Layer 2: associations and peers
 
-Candidate predictors include ownership, hospital type/size, emergency services, rurality, safety-net proxy, nearby psychiatric bed supply, county mental-health HPSA/workforce, state Medicaid expansion, and period. The current one-period model includes ownership, hospital type, emergency services, metro status, CMS certified beds and psychiatric-unit beds, county mental-health HPSA designation, and state fixed effects. Hospital-level bed measures and HPSA match coverage and temporal limits must be reported. Use hospital and state structure appropriate to the final panel; report adjusted associations, uncertainty, missingness, and collinearity. Define peer groups using pre-specified observable characteristics and minimum cell sizes, not outcome values.
+Candidate predictors include ownership, hospital type/size, emergency services, rurality, safety-net proxy, nearby psychiatric bed supply, county mental-health HPSA/workforce, state Medicaid expansion, and period. The current one-period model includes ownership, hospital type, emergency services, metro status, log CMS certified beds, a binary any-psychiatric-unit indicator, county mental-health HPSA designation, and state fixed effects. Hospital-level bed measures and HPSA match coverage and temporal limits must be reported. Use hospital and state structure appropriate to the final panel; report adjusted associations, uncertainty, missingness, and collinearity. Define peer groups using pre-specified observable characteristics and minimum cell sizes, not outcome values.
 
 ## Layer 3: policy evaluation
 
@@ -44,8 +50,3 @@ Pre-specified: alternative confirmed policy dates; exclude transition period; ba
 2. Confirm raw CMS schema and stable CCN before joining covariates.
 3. Confirm policy implementation dates from primary sources before treatment coding.
 4. Confirm outcome availability, number of adopting states, and pre-period support before causal estimation. If support is inadequate, report descriptive policy timing instead of a causal effect.
-
-
-## 2026-10-21 — outlier handling and stability summaries
-
-Flag any positive latest-period hospital gap above 1,440 minutes (24 hours) in `results/hospital_gap_outliers_over_24h.csv` and record the rule in the data-quality log. Retain flagged hospitals in the primary OLS model; rerun the expanded model with the outcome upper-winsorized at its 99th percentile as a sensitivity. Treat this as an influence sensitivity, not a correction of source values. The hospital-driver model uses log(1 + certified beds) and a binary indicator for any reported psychiatric-unit bed. Report rank churn only as aggregate overlap between 2025 deciles and each hospital’s mean over its available prior annual windows, not as a public facility league table.

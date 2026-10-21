@@ -1,0 +1,6 @@
+comparison,measure,matched_hospitals,decile_size,top_overlap_n,top_overlap_share,bottom_overlap_n,bottom_overlap_share
+2025 vs prior-years mean,Psychiatric gap (OP-18c minus OP-18b),2933,294,123,0.41836734693877553,84,0.2857142857142857
+2024 vs 2025,Psychiatric gap (OP-18c minus OP-18b),2566,257,99,0.3852140077821012,81,0.3151750972762646
+2025 vs prior-years mean,OP-18b median,2933,294,219,0.7448979591836735,207,0.7040816326530612
+2024 vs 2025,OP-18b median,2566,257,207,0.8054474708171206,195,0.7587548638132295
+

@@ -46,5 +46,24 @@
   "input_hospital_period_rows_after_threshold": 20050,
   "input_hospitals": 4047,
   "spa_effective_dates_in_source_table": 22,
-  "last_outcome_period_end": "2025-09-30"
+  "last_outcome_period_end": "2025-09-30",
+  "hca_houston_exclusion_sensitivity": {
+    "excluded_facility_ids": [
+      "450097",
+      "450617",
+      "450638",
+      "450644",
+      "450775",
+      "670106"
+    ],
+    "panel_hospitals_after_exclusion": 4041,
+    "event_time_0": [
+      {
+        "att_minutes": 2.072904596216315,
+        "ci95_low": -9.714421552435963,
+        "ci95_high": 14.567058685072318
+      }
+    ],
+    "interpretation": "Sensitivity removes six HCA Houston facilities from the Texas never-treated control across all outcome years."
+  }
 }

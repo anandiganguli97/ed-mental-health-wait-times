@@ -21,6 +21,7 @@ MIN_SAMPLE = 11
 MIN_CONTROL_STATES = 10
 N_BOOT = 999
 SEED = 20261020
+HCA_HOUSTON_IDS = {"450644", "450097", "450617", "450775", "670106", "450638"}
 
 
 def load_policy():
@@ -190,7 +191,7 @@ def estimate(d, periods, policy, date_column="effective_date"):
     return gt, dynamic, meta
 
 
-def write_report(gt, dynamic, meta, policy, approval_dynamic=None):
+def write_report(gt, dynamic, meta, policy, approval_dynamic=None, hca_dynamic=None):
     cells = int(gt.att_minutes.notna().sum()) if not gt.empty else 0
     pre = gt.loc[gt.status.eq("pre-trend diagnostic") & gt.att_minutes.notna()] if not gt.empty else pd.DataFrame()
     if dynamic.empty:
@@ -207,6 +208,10 @@ def write_report(gt, dynamic, meta, policy, approval_dynamic=None):
             for r in dynamic.itertuples(index=False))
     pre_note = (f"{len(pre)} pre-policy cohort-time diagnostics are available. They assess departures from parallel trends but cannot prove the assumption."
                 if len(pre) else "There is insufficient pre-policy support to assess differential trends.")
+    pre6 = dynamic.loc[dynamic.event_time.eq(-6)] if not dynamic.empty else pd.DataFrame()
+    if not pre6.empty and pre6.iloc[0].ci95_low > 0:
+        r = pre6.iloc[0]
+        pre_note += (f" The event-time −6 estimate is {r.att_minutes:+.1f} minutes (95% interval {r.ci95_low:+.1f} to {r.ci95_high:+.1f}), which excludes zero and is a warning against assuming parallel pre-trends.")
     early = gt.loc[gt.cohort.eq(2023) & gt.report_end_year.isin([2023, 2025]) & gt.att_minutes.notna()]
     early_note = ""
     if not early.empty:
@@ -224,6 +229,14 @@ def write_report(gt, dynamic, meta, policy, approval_dynamic=None):
                 parts.append(f"{label}: {r.att_minutes:+.1f} minutes (95% interval {r.ci95_low:+.1f} to {r.ci95_high:+.1f}; minimum {int(r.min_treated_states)} treated states)")
         if parts:
             approval_note = "\n\nApproval-date timing sensitivity: " + "; ".join(parts) + ". Event-time 2 has very limited treated-state support, so its interval is not a stable policy-effect estimate. Full pre- and post-period estimates are in `mobile_crisis_event_study_approval_date.csv`."
+    hca_note = ""
+    if hca_dynamic is not None and not hca_dynamic.empty:
+        hca0 = hca_dynamic.loc[hca_dynamic.event_time.eq(0)]
+        if not hca0.empty:
+            r = hca0.iloc[0]
+            hca_note = (f"\n\nA control-group sensitivity removes the six HCA Houston facilities (the IDs listed in the HCA annual audit) from all years. "
+                        f"Event time 0 is {r.att_minutes:+.1f} minutes (95% state-cluster bootstrap interval {r.ci95_low:+.1f} to {r.ci95_high:+.1f}). "
+                        "This checks the influence of that Texas system cluster; it does not establish that the flagged reporting pattern is an error.")
     report = f"""# Medicaid mobile-crisis authorization and the psychiatric ED time gap
 
 ## Result
@@ -247,7 +260,7 @@ CMS SPA effective dates indicate authorization under the Medicaid plan. Most sta
 {rows}
 
 Pre-period estimates are displayed as diagnostics and must be considered when assessing parallel trends. They are not proof that parallel trends holds. There are {cells} supported post-policy group-time cells. Full pre- and post-period support appears in mobile_crisis_group_time_att.csv and mobile_crisis_event_study.csv. An approval-date sensitivity analysis is reported in mobile_crisis_event_study_approval_date.csv; approval dates shift treatment timing later than effective dates in some states.
-{approval_note}
+{approval_note}{hca_note}
 
 ## Limits
 
@@ -267,6 +280,9 @@ def main():
     periods = d[["start_date", "end_date", "end_year"]].drop_duplicates().sort_values("end_year")
     gt, dynamic, meta = estimate(d, periods, policy, "effective_date")
     _, approval_dynamic, approval_meta = estimate(d, periods, policy, "approval_date")
+    d_no_hca = d.loc[~d.facility_id.isin(HCA_HOUSTON_IDS)].copy()
+    _, hca_dynamic, hca_meta = estimate(d_no_hca, periods, policy, "effective_date")
+    hca_dynamic.to_csv(RESULTS / "mobile_crisis_event_study_excluding_hca_houston.csv", index=False)
     gt.to_csv(RESULTS / "mobile_crisis_group_time_att.csv", index=False)
     dynamic.to_csv(RESULTS / "mobile_crisis_event_study.csv", index=False)
     approval_dynamic.to_csv(RESULTS / "mobile_crisis_event_study_approval_date.csv", index=False)
@@ -275,10 +291,15 @@ def main():
         "input_hospitals": int(d.facility_id.nunique()),
         "spa_effective_dates_in_source_table": int(policy.treatment_date.notna().sum()),
         "last_outcome_period_end": str(d.end_date.max().date()),
+        "hca_houston_exclusion_sensitivity": {"excluded_facility_ids": sorted(HCA_HOUSTON_IDS),
+            "panel_hospitals_after_exclusion": int(d_no_hca.facility_id.nunique()),
+            "event_time_0": (hca_dynamic.loc[hca_dynamic.event_time.eq(0), ["att_minutes", "ci95_low", "ci95_high"]].to_dict(orient="records")
+                             if not hca_dynamic.loc[hca_dynamic.event_time.eq(0)].empty else []),
+            "interpretation": "Sensitivity removes six HCA Houston facilities from the Texas never-treated control across all outcome years."}
     })
     (RESULTS / "mobile_crisis_did_metadata.json").write_text(json.dumps(meta, indent=2), encoding="utf-8")
     (RESULTS / "mobile_crisis_approval_date_metadata.json").write_text(json.dumps(approval_meta, indent=2), encoding="utf-8")
-    write_report(gt, dynamic, meta, policy, approval_dynamic)
+    write_report(gt, dynamic, meta, policy, approval_dynamic, hca_dynamic)
     print(json.dumps(meta, indent=2))
     if not dynamic.empty:
         print(dynamic.to_string(index=False))
@@ -286,3 +307,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

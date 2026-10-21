@@ -1,39 +1,32 @@
-# Psychiatric emergency department time: executive brief
+# Psychiatric emergency department time: a national benchmark
 
-## What the measure says
-
-For October 2024 through September 2025, 3,023 hospitals reported both CMS OP-18b and OP-18c results. The median hospital-level difference was **83 minutes** (interquartile range 39–146). This is the difference between two separately reported hospital medians for discharged ED visits. It is not the average extra time experienced by a patient and does not measure admitted-patient boarding. CMS's national aggregate difference for the same period is 95 minutes, a separate statistic.
+For October 2024–September 2025, the median hospital-level difference between psychiatric and non-psychiatric, non-transfer discharged ED visits was **83 minutes** (IQR 39–146) across 3,023 hospitals. This is a subtraction of two separately reported hospital medians. It is not an individual patient’s extra wait or an admitted-patient boarding measure.
 
 ## What stands out
 
-The median hospital gap was 76 minutes in the selected 2018 reporting period, 90 in 2022, 83 in 2024, and 83 in the latest year ending September 2025. Hospital coverage changes across years and windows overlap, so the pattern describes reported results rather than a causal trend.
+**The psychiatric gap changes rank from year to year.** Among the same 2,566 hospitals, 38.5% stayed in the top decile and 31.5% in the bottom decile from 2024 to 2025. OP-18b was steadier in those same hospitals: 80.5% and 75.9% stayed in their respective deciles. Against each hospital’s mean across earlier annual windows, psychiatric-gap overlap was 41.8% top and 28.6% bottom, compared with 74.5% and 70.4% for OP-18b. The difference is descriptive. Turnover combines real changes with noise; sample sizes 11–49 show broadly similar residual variation, which falls mainly above 50.
 
-Across 2,933 hospitals with a 2025 result and at least one earlier annual result, only 41.8% of the 2025 top decile and 28.6% of the 2025 bottom decile also appear in the corresponding decile when hospitals are grouped by their mean prior-year gap. This turnover mixes true hospital change with measurement noise; residual variation is broadly flat for samples 11–49 and declines above 50.
+**The expanded model finds a psych-unit association, with a composition caveat.** Hospitals reporting any psychiatric-unit bed had a 10.5-minute smaller reported gap (95% CI 20.1 to 0.8 minutes smaller). The p99-capped sensitivity gives a similar estimate: 8.8 minutes smaller (95% CI 16.7 to 0.9 minutes smaller). OP-18c counts psychiatric visits discharged from the ED and excludes transfers. Hospitals with psych units may admit their sickest patients, leaving a different acuity mix in the discharged group. CAHs may transfer patients who are excluded too. The observed difference can reflect who is counted as much as how quickly care happens; the public data cannot distinguish these explanations.
 
-The expanded model associates each one-unit increase in log(1 + certified beds) with +4.5 minutes (95% CI −2.2 to +11.2); any reported psychiatric-unit bed is associated with −10.5 minutes versus none (95% CI −20.1 to −0.8). The CAH estimate falls from −17.3 to −13.0 minutes (95% CI −28.7 to +2.7) after bed-count adjustment. Because CMS limits CAHs to 25 inpatient/swing beds, this attenuation is consistent with structural overlap between CAH status and size ([CMS CAH requirements](https://www.cms.gov/medicare/health-safety-standards/certification-compliance/critical-access-hospitals)). Two hospital gaps exceed 24 hours; both remain in the primary model and are capped only in a labeled 99th-percentile sensitivity. See the [driver analysis](hospital_driver_analysis.md) for details and limitations.
+**Extreme values change some driver estimates.** The primary model retains all observations. A sensitivity caps 31 of 3,023 latest-period gaps at the 99th percentile (602.34 minutes). The psych-unit association remains similar. Bed size (+7.5 minutes per log unit) and nonmetro status (+12.5 minutes) are positive in the capped model, while their primary-model intervals include zero. The proprietary estimate falls from +32.4 to +12.3 minutes. Since the outcome changes under capping, the R² shift from 5.8% to 10.7% and residual SD shift from 172 to 105 minutes are influence diagnostics, not directly comparable fit scores.
+
+The CAH estimate changes from −17.3 minutes in the baseline model to −13.0 (95% CI −28.7 to +2.7) in the expanded model. CMS limits CAHs to 25 inpatient/swing beds, so CAH status overlaps structurally with size ([CMS CAH requirements](https://www.cms.gov/medicare/health-safety-standards/certification-compliance/critical-access-hospitals)). The association is exploratory, not causal.
+
+## Reviewing the extreme values
+
+Applying the 24-hour rule to the selected annual panel flags **21 hospital-period values across 12 facilities**; all meet the 11-case threshold. Eleven are from three HCA Houston facilities. The West and Southeast CCNs are distinct: 450644 and 450097. The Southeast CCN appears as Bayshore Medical Center in 2018 and under its HCA name in later periods, so the broader CCN crosswalk remains open. For the six Houston facilities, the annual file gives the CCN, name, component medians, gap, and sample. A second analysis removes all six from the Texas never-treated control in the mobile-crisis model; the event-time 0 estimate changes from +3.1 to +2.1 minutes, with both intervals including zero. See the [annual outlier and rank audit](historical_outlier_and_rank_stability.md).
 
 ## What leaders can do with this
 
-Treat the national result as a prompt to measure local performance, not as a target for individual patients. A hospital or health system can:
+Use the 83-minute national median to prompt local measurement, not as a target or hospital rating. Review OP-18 results alongside patient-level timestamps, disposition, acuity, boarding, staffing, and transfer decisions. Separate discharged-visit time from time after an admission decision, and define a baseline before evaluating an operational change.
 
-1. Review its own OP-18 reporting alongside patient-level timestamps, disposition, boarding, staffing, and acuity. Separate discharged-visit time from time after an admission decision.
-2. Compare psychiatric and non-psychiatric pathways locally, then inspect where the difference arises: medical clearance, consultation, placement search, transport, or discharge planning.
-3. Pair any operational change with a defined outcome, a baseline period, and follow-up. Use subgroup checks to see whether changes improve access equitably.
+## Mobile-crisis authorization
 
-National hospital-level associations are not enough to select an intervention or rank individual facilities. Local process data are needed to identify bottlenecks.
+The pooled event-time 0 estimate was +3.1 minutes (95% state-cluster bootstrap interval −9.2 to +15.7), based on Medicaid SPA effective dates. The event-time −6 pre-period estimate was +13.9 minutes (interval 0.5 to 26.6), which excludes zero and warns against assuming parallel pre-trends. Statewide service launch dates are unverified for most states, so the model estimates authorization timing rather than teams actually operating. The result is exploratory, not evidence of no effect.
 
-## Mobile-crisis policy analysis
+## Data and limitations
 
-The pooled estimate at event time zero was +3.1 minutes (state-cluster bootstrap 95% interval −9.2 to +15.7), using SPA effective dates as authorization timing. The event-time −6 pre-period estimate is +13.9 minutes (95% bootstrap interval 0.5 to 26.6), which excludes zero and is a warning signal for the parallel-trends assumption. Other pre-period estimates are shown in the event study. The earliest four-state cohort (Arizona, North Carolina, New York, and Oregon) was lower in its supported post windows: −16.9 minutes at event time zero (95% interval −52.9 to +11.4) and −18.8 at event time two (−72.3 to +14.5). Those estimates are imprecise. An approval-date sensitivity shifts timing later and has only two treated states in event time zero and event time two; it does not support a stable effect estimate. Most states' statewide service launch dates are unverified, so this is not an estimate of mobile-crisis teams actually operating.
+The analysis uses 31 archived CMS releases and 145,833 hospital-snapshot rows. Annual panels retain the latest snapshot for each hospital-window and exclude transition windows. An 11-case threshold is applied to both OP-18 components. Shrinkage modestly improves held-out prediction of multi-year averages (RMSE reduction 2.7% in 2024 and 1.4% in 2025); dropping the six HCA Houston facilities leaves similarly small reductions (3.4% and 1.6%). The model does not produce validated uncertainty intervals or facility rankings. Annual residuals mix real changes and measurement noise. Current bed and HPSA data do not align perfectly with the 2025 outcome; HPSA is county-level, not a hospital workforce measure.
 
-## Limits and next measurement work
+See the [interactive dashboard](https://anandiganguli97.github.io/ed-mental-health-wait-times/site/dashboard.html), [driver analysis](hospital_driver_analysis.md), [historical outlier and rank audit](hospital_outlier_and_rank_stability.md), [mobile-crisis analysis](mobile_crisis_policy_analysis.md), and [analysis plan](../analysis-plan.md).
 
-The gap is a difference between reported medians, and CMS does not provide the patient-level distribution needed for a conventional interval around that difference. An exploratory shrinkage model for multi-year averages improves held-out-year prediction modestly (RMSE reduction 2.7% for 2024, 1.4% for 2025). Its year-to-year residual variation also includes genuine changes in hospitals; it is not a validated sampling-uncertainty model and does not justify public rankings.
-
-Minimum-sample sensitivity also changes which hospitals are included: the median is 83 minutes at threshold 11, 93 at 20, and 67 at 100. That movement reflects selection into different hospital groups as well as any precision differences. Next, improve the time alignment of the bed and HPSA measures, then assess whether stronger hospital-level workforce and nearby-capacity sources add useful explanatory power. The current additions do not materially change the model's limited explanatory power.
-
-CMS is transitioning from the legacy discharged-ED measure to the Emergency Care Access & Timeliness eCQM. The historical series is a baseline, not a validated crosswalk to the new measure. See the [CMS 2026 OPPS final-rule fact sheet](https://www.cms.gov/newsroom/fact-sheets/calendar-year-2026-hospital-outpatient-prospective-payment-system-opps-ambulatory-surgical-center).
-
-## Technical detail
-
-The analysis uses 31 archived CMS releases and 145,833 hospital-snapshot rows. The latest release containing OP-18 was retrieved August 13, 2026. Details and reproducible scripts are in the [historical benchmark](national_historical_benchmark.md), [driver analysis](hospital_driver_analysis.md), [mobile-crisis analysis](mobile_crisis_policy_analysis.md), [analysis plan](../analysis-plan.md), and [state source audit](../policy/mobile-crisis-adoption.csv).

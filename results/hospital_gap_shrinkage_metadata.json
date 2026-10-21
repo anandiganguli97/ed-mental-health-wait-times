@@ -14,16 +14,124 @@
   "variance_source": "within-hospital deviations after additive year effects in repeated annual, non-overlapping windows",
   "interpretation_limit": "annual residual variation includes real hospital changes and measurement noise; it is not a validated sampling variance or confidence interval for a median difference",
   "rank_churn": {
-    "matched_hospitals": 2933,
-    "decile_size": 294,
-    "prior_years_minimum": 1,
-    "prior_year_mean_years_median": 5.0,
-    "top_decile_overlap_n": 123,
-    "top_decile_overlap_share": 0.41836734693877553,
-    "bottom_decile_overlap_n": 84,
-    "bottom_decile_overlap_share": 0.2857142857142857,
-    "definition": "Top/bottom decile of 2025 gap versus top/bottom decile of each matched hospital's mean across all available selected annual windows before 2025; at least one prior year; ceil(10% of matched hospitals), ties broken by facility ID.",
-    "interpretation_limit": "Annual rank churn mixes true hospital change with measurement noise and is not a hospital quality rating."
+    "sample_threshold": 11,
+    "years": [
+      2018,
+      2020,
+      2021,
+      2022,
+      2023,
+      2024,
+      2025
+    ],
+    "decile_rule": "ceil(10% of common matched hospitals); ties broken by six-digit CMS facility ID",
+    "comparison_sample_rule": "Same hospitals with reportable OP-18b and OP-18c, at least 11 cases in both components, for both outcomes.",
+    "multi_year_prior_mean": {
+      "comparison": "2025 versus each hospital's mean across all available earlier selected annual windows",
+      "median_number_of_prior_years": 5.0,
+      "psychiatric_gap": {
+        "matched_hospitals": 2933,
+        "decile_size": 294,
+        "top_overlap_n": 123,
+        "top_overlap_share": 0.41836734693877553,
+        "bottom_overlap_n": 84,
+        "bottom_overlap_share": 0.2857142857142857
+      },
+      "op18b_median": {
+        "matched_hospitals": 2933,
+        "decile_size": 294,
+        "top_overlap_n": 219,
+        "top_overlap_share": 0.7448979591836735,
+        "bottom_overlap_n": 207,
+        "bottom_overlap_share": 0.7040816326530612
+      }
+    },
+    "year_over_year": {
+      "comparison": "2024 versus 2025 annual reporting windows",
+      "psychiatric_gap": {
+        "matched_hospitals": 2566,
+        "decile_size": 257,
+        "top_overlap_n": 99,
+        "top_overlap_share": 0.3852140077821012,
+        "bottom_overlap_n": 81,
+        "bottom_overlap_share": 0.3151750972762646
+      },
+      "op18b_median": {
+        "matched_hospitals": 2566,
+        "decile_size": 257,
+        "top_overlap_n": 207,
+        "top_overlap_share": 0.8054474708171206,
+        "bottom_overlap_n": 195,
+        "bottom_overlap_share": 0.7587548638132295
+      }
+    },
+    "sensitivity_excluding_hca_houston": {
+      "excluded_hca_houston_facility_ids": [
+        "450097",
+        "450617",
+        "450638",
+        "450644",
+        "450775",
+        "670106"
+      ],
+      "2025_vs_prior_year_mean": {
+        "psychiatric_gap": {
+          "matched_hospitals": 2927,
+          "decile_size": 293,
+          "top_overlap_n": 120,
+          "top_overlap_share": 0.40955631399317405,
+          "bottom_overlap_n": 84,
+          "bottom_overlap_share": 0.28668941979522183
+        },
+        "op18b_median": {
+          "matched_hospitals": 2927,
+          "decile_size": 293,
+          "top_overlap_n": 218,
+          "top_overlap_share": 0.7440273037542662,
+          "bottom_overlap_n": 206,
+          "bottom_overlap_share": 0.7030716723549488
+        }
+      },
+      "2024_vs_2025": {
+        "psychiatric_gap": {
+          "matched_hospitals": 2560,
+          "decile_size": 256,
+          "top_overlap_n": 97,
+          "top_overlap_share": 0.37890625,
+          "bottom_overlap_n": 80,
+          "bottom_overlap_share": 0.3125
+        },
+        "op18b_median": {
+          "matched_hospitals": 2560,
+          "decile_size": 256,
+          "top_overlap_n": 205,
+          "top_overlap_share": 0.80078125,
+          "bottom_overlap_n": 194,
+          "bottom_overlap_share": 0.7578125
+        }
+      }
+    },
+    "interpretation_limit": "Decile turnover mixes true change with measurement noise; sample size alone does not explain all annual variation."
+  },
+  "historical_outlier_audit": {
+    "selected_annual_hospital_period_rows": 32832,
+    "reportable_gap_rows": 20050,
+    "rows_over_24h": 21,
+    "unique_hospitals_over_24h": 12,
+    "hca_houston_rows_over_24h": 11,
+    "hca_houston_unique_facilities_over_24h": 3,
+    "outlier_rows_meeting_sample_minimum_11": 21,
+    "flag_rule": "positive OP-18c minus OP-18b gap > 1,440 minutes, applied to selected annual windows 2018 and 2020-2025 after retaining the latest CMS snapshot for each hospital-window",
+    "southeast_and_west_raw_ccn_names_stable": true,
+    "hca_houston_panel_name_aliases_by_ccn": {
+      "450097": "BAYSHORE MEDICAL CENTER | HCA HOUSTON HEALTHCARE SOUTHEAST",
+      "450775": "HCA HOUSTON HEALTHCARE KINGWOOD | KINGWOOD MEDICAL CENTER"
+    },
+    "outputs": [
+      "hospital_gap_outliers_over_24h.csv",
+      "hca_houston_facility_annual_audit.csv",
+      "hca_houston_ccn_name_audit.csv"
+    ]
   },
   "noise_variance_intercept": 1140.9594264017392,
   "noise_variance_reciprocal_sample_slope": 36788.97195918275,
@@ -180,6 +288,118 @@
           "median_sample": 357.0,
           "residual_scale_minutes": 23.807097695527933,
           "residual_variance_minutes2": 566.7779006844114
+        }
+      ]
+    }
+  ],
+  "validation_excluding_hca_houston_six_facilities": [
+    {
+      "test_year": 2024,
+      "train_rows": 14002,
+      "test_hospitals": 2902,
+      "noise_variance_intercept": 1149.7179083189133,
+      "noise_variance_reciprocal_sample_slope": 29773.42225475971,
+      "between_hospital_variance": 10138.8661819653,
+      "unshrunk_rmse_minutes": 123.50691042631387,
+      "shrunk_rmse_minutes": 119.28057113535854,
+      "rmse_change_percent": -3.4219456031788775,
+      "noise_bins": [
+        {
+          "sample_bin": "11-19",
+          "n_rows": 7068,
+          "median_sample": 15.0,
+          "residual_scale_minutes": 49.28253172290133,
+          "residual_variance_minutes2": 2428.767933018776
+        },
+        {
+          "sample_bin": "20-29",
+          "n_rows": 3963,
+          "median_sample": 23.0,
+          "residual_scale_minutes": 52.65696445533433,
+          "residual_variance_minutes2": 2772.7559056503433
+        },
+        {
+          "sample_bin": "30-49",
+          "n_rows": 2015,
+          "median_sample": 35.0,
+          "residual_scale_minutes": 55.54253966264963,
+          "residual_variance_minutes2": 3084.973712177007
+        },
+        {
+          "sample_bin": "50-99",
+          "n_rows": 628,
+          "median_sample": 63.0,
+          "residual_scale_minutes": 45.60895332506245,
+          "residual_variance_minutes2": 2080.1766234077254
+        },
+        {
+          "sample_bin": "100-199",
+          "n_rows": 151,
+          "median_sample": 125.0,
+          "residual_scale_minutes": 30.96180069269052,
+          "residual_variance_minutes2": 958.6331021338912
+        },
+        {
+          "sample_bin": "200+",
+          "n_rows": 177,
+          "median_sample": 359.0,
+          "residual_scale_minutes": 22.288484099911724,
+          "residual_variance_minutes2": 496.77652347201774
+        }
+      ]
+    },
+    {
+      "test_year": 2025,
+      "train_rows": 16991,
+      "test_hospitals": 2927,
+      "noise_variance_intercept": 1138.3186020277892,
+      "noise_variance_reciprocal_sample_slope": 36127.81088141544,
+      "between_hospital_variance": 8646.309034796439,
+      "unshrunk_rmse_minutes": 163.25483192921527,
+      "shrunk_rmse_minutes": 160.7003216715427,
+      "rmse_change_percent": -1.5647379176992215,
+      "noise_bins": [
+        {
+          "sample_bin": "11-19",
+          "n_rows": 8656,
+          "median_sample": 15.0,
+          "residual_scale_minutes": 52.532643932397114,
+          "residual_variance_minutes2": 2759.678678528019
+        },
+        {
+          "sample_bin": "20-29",
+          "n_rows": 4807,
+          "median_sample": 23.0,
+          "residual_scale_minutes": 56.2403574715539,
+          "residual_variance_minutes2": 3162.9778085281687
+        },
+        {
+          "sample_bin": "30-49",
+          "n_rows": 2376,
+          "median_sample": 35.0,
+          "residual_scale_minutes": 57.761341432699794,
+          "residual_variance_minutes2": 3336.372564104922
+        },
+        {
+          "sample_bin": "50-99",
+          "n_rows": 739,
+          "median_sample": 63.0,
+          "residual_scale_minutes": 44.87584894547235,
+          "residual_variance_minutes2": 2013.8418185768517
+        },
+        {
+          "sample_bin": "100-199",
+          "n_rows": 192,
+          "median_sample": 126.5,
+          "residual_scale_minutes": 31.563800668100676,
+          "residual_variance_minutes2": 996.2735126155926
+        },
+        {
+          "sample_bin": "200+",
+          "n_rows": 221,
+          "median_sample": 357.0,
+          "residual_scale_minutes": 23.076752755788974,
+          "residual_variance_minutes2": 532.536517751814
         }
       ]
     }

@@ -1,12 +1,100 @@
 {
-  "matched_hospitals": 2933,
-  "decile_size": 294,
-  "prior_years_minimum": 1,
-  "prior_year_mean_years_median": 5.0,
-  "top_decile_overlap_n": 123,
-  "top_decile_overlap_share": 0.41836734693877553,
-  "bottom_decile_overlap_n": 84,
-  "bottom_decile_overlap_share": 0.2857142857142857,
-  "definition": "Top/bottom decile of 2025 gap versus top/bottom decile of each matched hospital's mean across all available selected annual windows before 2025; at least one prior year; ceil(10% of matched hospitals), ties broken by facility ID.",
-  "interpretation_limit": "Annual rank churn mixes true hospital change with measurement noise and is not a hospital quality rating."
+  "sample_threshold": 11,
+  "years": [
+    2018,
+    2020,
+    2021,
+    2022,
+    2023,
+    2024,
+    2025
+  ],
+  "decile_rule": "ceil(10% of common matched hospitals); ties broken by six-digit CMS facility ID",
+  "comparison_sample_rule": "Same hospitals with reportable OP-18b and OP-18c, at least 11 cases in both components, for both outcomes.",
+  "multi_year_prior_mean": {
+    "comparison": "2025 versus each hospital's mean across all available earlier selected annual windows",
+    "median_number_of_prior_years": 5.0,
+    "psychiatric_gap": {
+      "matched_hospitals": 2933,
+      "decile_size": 294,
+      "top_overlap_n": 123,
+      "top_overlap_share": 0.41836734693877553,
+      "bottom_overlap_n": 84,
+      "bottom_overlap_share": 0.2857142857142857
+    },
+    "op18b_median": {
+      "matched_hospitals": 2933,
+      "decile_size": 294,
+      "top_overlap_n": 219,
+      "top_overlap_share": 0.7448979591836735,
+      "bottom_overlap_n": 207,
+      "bottom_overlap_share": 0.7040816326530612
+    }
+  },
+  "year_over_year": {
+    "comparison": "2024 versus 2025 annual reporting windows",
+    "psychiatric_gap": {
+      "matched_hospitals": 2566,
+      "decile_size": 257,
+      "top_overlap_n": 99,
+      "top_overlap_share": 0.3852140077821012,
+      "bottom_overlap_n": 81,
+      "bottom_overlap_share": 0.3151750972762646
+    },
+    "op18b_median": {
+      "matched_hospitals": 2566,
+      "decile_size": 257,
+      "top_overlap_n": 207,
+      "top_overlap_share": 0.8054474708171206,
+      "bottom_overlap_n": 195,
+      "bottom_overlap_share": 0.7587548638132295
+    }
+  },
+  "sensitivity_excluding_hca_houston": {
+    "excluded_hca_houston_facility_ids": [
+      "450097",
+      "450617",
+      "450638",
+      "450644",
+      "450775",
+      "670106"
+    ],
+    "2025_vs_prior_year_mean": {
+      "psychiatric_gap": {
+        "matched_hospitals": 2927,
+        "decile_size": 293,
+        "top_overlap_n": 120,
+        "top_overlap_share": 0.40955631399317405,
+        "bottom_overlap_n": 84,
+        "bottom_overlap_share": 0.28668941979522183
+      },
+      "op18b_median": {
+        "matched_hospitals": 2927,
+        "decile_size": 293,
+        "top_overlap_n": 218,
+        "top_overlap_share": 0.7440273037542662,
+        "bottom_overlap_n": 206,
+        "bottom_overlap_share": 0.7030716723549488
+      }
+    },
+    "2024_vs_2025": {
+      "psychiatric_gap": {
+        "matched_hospitals": 2560,
+        "decile_size": 256,
+        "top_overlap_n": 97,
+        "top_overlap_share": 0.37890625,
+        "bottom_overlap_n": 80,
+        "bottom_overlap_share": 0.3125
+      },
+      "op18b_median": {
+        "matched_hospitals": 2560,
+        "decile_size": 256,
+        "top_overlap_n": 205,
+        "top_overlap_share": 0.80078125,
+        "bottom_overlap_n": 194,
+        "bottom_overlap_share": 0.7578125
+      }
+    }
+  },
+  "interpretation_limit": "Decile turnover mixes true change with measurement noise; sample size alone does not explain all annual variation."
 }
